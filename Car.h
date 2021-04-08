@@ -16,4 +16,6 @@ public:
      static void drawTier(GLUquadric* quadrique);
      static void drawGirophare(GLUquadric* quadrique, uint64_t iTimeElapsed);
 
+     //Getter
+     float getWidth() const { return 6.; }
 };

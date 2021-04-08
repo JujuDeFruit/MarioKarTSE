@@ -5,6 +5,9 @@
 // Classe dediee pour la gestion des bidon
 class Barrel
 {
+private:
+    GLuint* TextureID = new GLuint[1];
+
 public:
     // Constructeur avec parametres
     Barrel();
@@ -15,9 +18,6 @@ public:
     // Methode d'affichage
      void Display(uint64_t iTimeElapsed);
      static void drawBarrel(GLUquadric* quadrique);
-
-private:
-    GLuint* TextureID = new GLuint[1];
 
 };
 

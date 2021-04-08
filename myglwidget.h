@@ -9,11 +9,7 @@
 // Classe dediee a l'affichage d'une scene OpenGL
 class MyGLWidget : public QOpenGLWidget
 {
-public:
-
-    // Constructeur
-    MyGLWidget(QWidget * parent = nullptr);
-
+private:
     int W = 1;
     int H = 1;
 
@@ -22,6 +18,14 @@ public:
 
     float m_TimeElapsed { 0.0f };
     QTimer m_AnimationTimer;
+
+    Ground * ground;
+    Barrel * barrel;
+    Car * car;
+
+public:
+    // Constructeur
+    MyGLWidget(QWidget * parent = nullptr);
 
 protected:
 

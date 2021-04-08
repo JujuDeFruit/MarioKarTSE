@@ -3,7 +3,7 @@
 Barrel::Barrel(){
 
     // Texture
-    QImage s_fuel=QGLWidget::convertToGLFormat(QImage("C:/Users/COMPAQ/Desktop/Projet_openGL/StarterTD2/res/fuel.jpg"));
+    QImage s_fuel=QGLWidget::convertToGLFormat(QImage(":/fuel.jpg"));
 
     glGenTextures(1, TextureID);
 
