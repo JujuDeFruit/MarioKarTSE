@@ -4,9 +4,9 @@
 Ground::Ground(){
 
     // Textures
-    QImage grass=QGLWidget::convertToGLFormat(QImage("C:/Users/COMPAQ/Desktop/Projet_openGL/StarterTD2/res/grass.jpg"));
-    QImage sky=QGLWidget::convertToGLFormat(QImage("C:/Users/COMPAQ/Desktop/Projet_openGL/StarterTD2/res/sky.jpg"));
-    QImage road=QGLWidget::convertToGLFormat(QImage("C:/Users/COMPAQ/Desktop/Projet_openGL/StarterTD2/res/road.jpg"));
+    QImage grass = QGLWidget::convertToGLFormat(QImage(":/grass.jpg"));
+    QImage sky = QGLWidget::convertToGLFormat(QImage(":/sky.jpg"));
+    QImage road = QGLWidget::convertToGLFormat(QImage(":/road.jpg"));
 
     glGenTextures(3,TextureID);
 

@@ -77,43 +77,37 @@ void MyGLWidget::paintGL()
     //gluLookAt(0.,0.2,60.,0.,0.,0.,0.,1.,0.);
 
     // Affichage des bidon
-    Barrel *myBarrel = new Barrel();
-    myBarrel->Display(m_TimeElapsed);
+    barrel = new Barrel();
+    barrel->Display(m_TimeElapsed);
 
     // Affichage de la route
-    Ground *myGround = new Ground();
-    myGround->Display(m_TimeElapsed);
+    ground = new Ground();
+    ground->Display(m_TimeElapsed);
 
     // Affichage de la voiture
     glTranslated(left_right ,1., up_down);
-    Car *maVoiture = new Car();
-    maVoiture->Display(m_TimeElapsed);
 
-
-
-
+    car = new Car();
+    car->Display(m_TimeElapsed);
 }
 
 
 // Fonction de gestion d'interactions clavier
 void MyGLWidget::keyPressEvent(QKeyEvent * event)
 {
+    const float roadWidth = ground->getRoadWidth();
+    const float carWidth = car->getWidth();
+
     switch(event->key())
     {
-        case Qt::Key_Down:
-              up_down = up_down + 2.;
-              break;
-
-        case Qt::Key_Up:
-              up_down = up_down - 2.;
-              break;
-
+        // Move car to left side, and make sure car does not get out of the road
         case Qt::Key_Left:
-              left_right = left_right - 2.;
+              left_right = left_right - carWidth / 2 > - roadWidth / 2 ? left_right - 2. : left_right;
               break;
 
+        // Move car to right side, and make sure car does not get out of the road
         case Qt::Key_Right:
-              left_right = left_right + 2.;
+              left_right = left_right + carWidth / 2 < roadWidth / 2 ? left_right + 2. : left_right;
               break;
 
         // Cas par defaut

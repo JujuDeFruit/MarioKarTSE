@@ -28,3 +28,6 @@ HEADERS += myglwidget.h \
     Car.h \
     Ground.h \
     barrel.h
+
+RESOURCES += \
+    res/textures.qrc
