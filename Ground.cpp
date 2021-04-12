@@ -1,6 +1,5 @@
 #include "Ground.h"
 
-
 Ground::Ground(){
 
     // Textures

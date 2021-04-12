@@ -22,7 +22,7 @@ Barrel::~Barrel(){
     delete [] TextureID;
 }
 
-void Barrel::Display(uint64_t iTimeElapsed) {
+void Barrel::Display(uint64_t iTimeElapsed, Ground * ground) {
 
      glDisable(GL_LIGHTING);
      glEnable(GL_TEXTURE_2D);
@@ -36,20 +36,19 @@ void Barrel::Display(uint64_t iTimeElapsed) {
 
      // Draw Barrel
      glPushMatrix();
-     glTranslated(-21.f,5.f, -200. + (iTimeElapsed % 260)); // trans
+     glTranslated(- ground->getRoadWidth()/2 - 1., 5.f, -200. + (iTimeElapsed % 260)); // trans
      drawBarrel(quadrique);
      glPopMatrix();
 
      glPushMatrix();
-     glTranslated(21.f,5.f, -250. + (iTimeElapsed % 310)); // trans
+     glTranslated(ground->getRoadWidth()/2 + 1., 5.f, -250. + (iTimeElapsed % 310)); // trans
      drawBarrel(quadrique);
      glPopMatrix();
 
      glPushMatrix();
-     glTranslated(21.f,5.f, -330. + (iTimeElapsed % 390)); // trans
+     glTranslated(ground->getRoadWidth()/2 + 1., 5.f, -330. + (iTimeElapsed % 390)); // trans
      drawBarrel(quadrique);
      glPopMatrix();
-
 
      gluDeleteQuadric(quadrique);     // remove barrel when out of frame
 
@@ -62,12 +61,9 @@ void Barrel::drawBarrel(GLUquadric* quadrique){
 
 
     glPushMatrix();
-    glRotated(90., 1., 0., 0.);        // rotation autour de l'axe x
-
-
+    glRotated(90., 1., 0., 0.);        // rotation autour de l'axe
 
     glColor3f(1.f, 1.f, 1.f);           // color Barrel
-
 
     gluQuadricTexture(quadrique, GL_TRUE);  // Texture
     gluCylinder(quadrique,1.5, 1.5, 5., 40., 40.);

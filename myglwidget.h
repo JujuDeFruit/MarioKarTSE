@@ -1,5 +1,5 @@
 #include "Car.h"
-#include "Ground.h"
+
 #include "barrel.h"
 #include <QOpenGLWidget>
 #include <GL/glu.h>
@@ -13,7 +13,6 @@ private:
     int W = 1;
     int H = 1;
 
-    double up_down = 30.;
     double left_right = 0.;
 
     float m_TimeElapsed { 0.0f };
@@ -23,6 +22,7 @@ private:
     Barrel * barrel;
     Car * car;
 
+    Car * oppositeCars;
 public:
     // Constructeur
     MyGLWidget(QWidget * parent = nullptr);
@@ -40,4 +40,7 @@ protected:
 
     // Fonction de gestion d'interactions clavier
     void keyPressEvent(QKeyEvent* event);
+
+    // Generate car coming from opposite side
+    void generateCar();
 };

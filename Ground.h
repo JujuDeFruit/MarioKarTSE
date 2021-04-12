@@ -21,4 +21,5 @@ public:
 
     // Getters
     float getRoadWidth() const { return 50.; }
+    float getRoadHeight() const {return 200.; }
 };

@@ -1,18 +1,17 @@
 #include "Car.h"
 
-Car::Car(){
+Car::Car(GLfloat * color_){
+    color = color_;
 }
 
-Car::~Car(){
-}
+Car::~Car(){}
 
 void Car::Display(uint64_t iTimeElapsed) {
 
     glPushMatrix();
 
     // Car material
-    GLfloat ColorAmbient_car[] = {0.25f, 0.25f, 0.25f };
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ColorAmbient_car);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, color);
     GLfloat ColorDiffuse_car[] = {0.4f, 0.4f, 0.4f };
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, ColorDiffuse_car);
     GLfloat ColorSpeculaire_car[] = {0.774597f, 0.774597f, 0.774597f };
@@ -47,7 +46,7 @@ void Car::Display(uint64_t iTimeElapsed) {
     glVertex3f(-3.0f,0.0f,-5.f);
     glVertex3f(-3.0f,3.0f,-5.f);
 
-    // Rignt
+    // Right
     glColor3ub(100,0,0);
     glNormal3f(1.f,0.f,0.f);
     glVertex3f(3.0f,3.0f,-26.f);
@@ -128,8 +127,6 @@ void Car::Display(uint64_t iTimeElapsed) {
     drawGirophare(quadrique1, iTimeElapsed);
     glPopMatrix();
 
-
-
     // ////////////////////////////// Windows
 
     // window Material
@@ -155,7 +152,7 @@ void Car::Display(uint64_t iTimeElapsed) {
     glVertex3f(-3.001f,3.0f,-14.f);
     glVertex3f(-3.001f,4.8f,-14.f);
 
-    // Rignt Front
+    // Right Front
     glColor3f(0.f,0.f,0.f);
     glNormal3f(1.f,0.f,0.f);
     glVertex3f(3.01f,4.8f,-17.7f);
@@ -171,7 +168,7 @@ void Car::Display(uint64_t iTimeElapsed) {
     glVertex3f(-3.01f,3.0f,-8.3f);
     glVertex3f(-3.01f,4.8f,-9.3f);
 
-    // Rignt Back
+    // Right Back
     glColor3f(0.f,0.f,0.f);
     glNormal3f(1.f,0.f,0.f);
     glVertex3f(3.01f,4.8f,-13.5f);

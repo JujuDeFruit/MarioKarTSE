@@ -2,13 +2,17 @@
 #include <QApplication>
 #include <QDesktopWidget>
 #include <GL/glu.h>
-
-// Declarations des constantes
-const unsigned int WIN = 900;
+#include <stdlib.h>
+#include <windows.h>
+#include <stdlib.h>     /* srand, rand */
+#include <time.h>
 
 // Constructeur
 MyGLWidget::MyGLWidget(QWidget * parent) : QOpenGLWidget(parent)
 {
+    // Declarations des constantes
+    const unsigned int WIN = 900;
+
     // Reglage de la taille/position
     setFixedSize(WIN, WIN);
     move(QApplication::desktop()->screen()->rect().center() - rect().center());
@@ -19,6 +23,8 @@ MyGLWidget::MyGLWidget(QWidget * parent) : QOpenGLWidget(parent)
         m_TimeElapsed += 1.0f;
         update();
     });
+
+    oppositeCars = new Car[3];
 
     m_AnimationTimer.setInterval(15);
     m_AnimationTimer.start();
@@ -74,21 +80,23 @@ void MyGLWidget::paintGL()
              //camX camY camZ cibleX cibleY cibleZ vecX vecY vecZ
     gluLookAt(0.,25.,60.,0.,0.,0.,0.,1.,0.);
 
-    //gluLookAt(0.,0.2,60.,0.,0.,0.,0.,1.,0.);
-
-    // Affichage des bidon
-    barrel = new Barrel();
-    barrel->Display(m_TimeElapsed);
-
     // Affichage de la route
     ground = new Ground();
     ground->Display(m_TimeElapsed);
 
+    // Affichage des bidon
+    barrel = new Barrel();
+    barrel->Display(m_TimeElapsed, ground);
+
+    glPushMatrix();
     // Affichage de la voiture
-    glTranslated(left_right ,1., up_down);
+    glTranslated(left_right ,1., 0.);
 
     car = new Car();
     car->Display(m_TimeElapsed);
+    glPopMatrix();
+
+    generateCar();
 }
 
 
@@ -122,4 +130,35 @@ void MyGLWidget::keyPressEvent(QKeyEvent * event)
     // Acceptation de l'evenement et mise a jour de la scene
     event->accept();
     update();
+}
+
+/*
+ * Generate car coming from opposite side
+ */
+void MyGLWidget::generateCar() {
+    // Generate random seed
+    std::srand(time(0));
+
+    glPushMatrix();
+    glRotatef(180, 0, 1, 0);
+
+    GLfloat * color = new GLfloat[3] {1., 0., 0.};
+
+    // Get random percent of the road (0% left side of the road; 10% right side of the road)
+    float percentOfXRoad = (std::rand() % 100 + 1) / 100.;
+
+    GLfloat * scopeRoad = new GLfloat[2] { (car->getWidth() - ground->getRoadWidth())/2, (ground->getRoadWidth() - car->getWidth())/2};
+
+    float * pos = new float[3];
+    pos[0] = scopeRoad[0] + percentOfXRoad * (scopeRoad[1] - scopeRoad[0]);
+    pos[1] = 1.;
+    pos[2] = ground->getRoadHeight();
+
+    glTranslated(pos[0], pos[1], pos[2]);
+
+    Car * car = new Car(color);
+    car->setPosition(pos);
+    car->Display(m_TimeElapsed);
+
+    glPopMatrix();
 }
