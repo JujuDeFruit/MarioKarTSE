@@ -1,6 +1,7 @@
 #include <qopengl.h>
 #include <GL/glu.h>
 #include <QGLWidget>
+#include "Ground.h"
 
 // Classe dediee pour la gestion des bidon
 class Barrel
@@ -16,8 +17,8 @@ public:
     ~Barrel();
 
     // Methode d'affichage
-     void Display(uint64_t iTimeElapsed);
-     static void drawBarrel(GLUquadric* quadrique);
+     void Display(uint64_t, Ground *);
+     static void drawBarrel(GLUquadric *);
 
 };
 
