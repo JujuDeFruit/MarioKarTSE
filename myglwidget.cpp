@@ -2,30 +2,51 @@
 #include <QApplication>
 #include <QDesktopWidget>
 #include <GL/glu.h>
+#include <stdlib.h>
+#include <windows.h>
+#include <stdlib.h>
+#include <time.h>
 
-// Declarations des constantes
-const unsigned int WIN = 900;
+#include <iostream>
 
-// Constructeur
+/*
+ * Constructor of main openGL Widget
+ *
+ * @param parent : parent widget
+ */
 MyGLWidget::MyGLWidget(QWidget * parent) : QOpenGLWidget(parent)
 {
-    // Reglage de la taille/position
+    // Const declaration
+    const unsigned int WIN = 900;
+
+    // Window settings
     setFixedSize(WIN, WIN);
     move(QApplication::desktop()->screen()->rect().center() - rect().center());
 
-    // Timer pour le clignotement
-        // Connexion du timer
+    // Set interval to refresh window
     connect(&m_AnimationTimer,  &QTimer::timeout, [&] {
         m_TimeElapsed += 1.0f;
         update();
     });
+
+    // Initialize arrays of pointers of cars
+    oppositeCars = new Car*[NB_OPPOSITE_CARS];
+
+    // Generate random seed
+    std::srand(time(0));
+    // Generate cars and fill array
+    for(unsigned int i = 0; i < NB_OPPOSITE_CARS; i++) generateCar(i, true);
 
     m_AnimationTimer.setInterval(15);
     m_AnimationTimer.start();
 }
 
 
-// Fonction d'initialisation
+/*
+ * Overriding OpenGL initialization method
+ *
+ * @return void
+ */
 void MyGLWidget::initializeGL()
 {
     // changer la couleur du fond
@@ -48,16 +69,25 @@ void MyGLWidget::initializeGL()
 }
 
 
-// Fonction de redimensionnement
+/*
+ * Overriding OpenGL resizing window method.
+ *
+ * @params width : window width
+ * @params height : window height
+ * @return void
+ */
 void MyGLWidget::resizeGL(int width, int height)
 {
-    // Definition du viewport (zone d'affichage)
+    // Viewport definiton, printing area
     glViewport(0, 0, width, height);
-    W = width;
-    H = height;
 }
 
-// Fonction d'affichage
+
+/*
+ * Overriding OpenGL printing method
+ *
+ * @return void
+ */
 void MyGLWidget::paintGL()
 {
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
@@ -65,34 +95,44 @@ void MyGLWidget::paintGL()
     // Reinitialisation de la matrice courante
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();                           // affecter la matrice identité à la matrice courante
-    gluPerspective(70.f, W/H, 0.1f, 500.f);
+    gluPerspective(70.f, 1, 0.1f, 500.f);
 
     glMatrixMode(GL_MODELVIEW);                 // pour placer nos objets dans un monde 3D
     glLoadIdentity();
 
-    // Placer la caméra
+    // Set the camera
              //camX camY camZ cibleX cibleY cibleZ vecX vecY vecZ
-    gluLookAt(0.,25.,60.,0.,0.,0.,0.,1.,0.);
-
-    //gluLookAt(0.,0.2,60.,0.,0.,0.,0.,1.,0.);
-
-    // Affichage des bidon
-    barrel = new Barrel();
-    barrel->Display(m_TimeElapsed);
+    gluLookAt(0.,25., CAMERA_Z_POSITION,0.,0.,0.,0.,1.,0.);
+    //gluLookAt(0.,150., 0,0.,0.,0.,0.,0.,1.);
 
     // Affichage de la route
-    ground = new Ground();
-    ground->Display(m_TimeElapsed);
+    ground = new Ground(m_TimeElapsed);
+    ground->Display();
 
-    // Affichage de la voiture
-    glTranslated(left_right ,1., up_down);
+    // Print barrels
+    barrel = new Barrel();
+    barrel->Display(m_TimeElapsed, ground);
+
+    glPushMatrix();
+    // Print main car
+    glTranslated(left_right ,1., 0.);
 
     car = new Car();
     car->Display(m_TimeElapsed);
+    glPopMatrix();
+
+    displayCars();
+
+    checkCollison();
 }
 
 
-// Fonction de gestion d'interactions clavier
+/*
+ * Keyboard interaction method
+ *
+ * @param event : key pressed event
+ * @return void
+ */
 void MyGLWidget::keyPressEvent(QKeyEvent * event)
 {
     const float roadWidth = ground->getRoadWidth();
@@ -122,4 +162,98 @@ void MyGLWidget::keyPressEvent(QKeyEvent * event)
     // Acceptation de l'evenement et mise a jour de la scene
     event->accept();
     update();
+}
+
+
+/*
+ * Generate car coming from opposite side
+ *
+ * @param i : index of array to generate car
+ * @param init : boolean to set initialisation of the game or not
+ * @return void
+ */
+void MyGLWidget::generateCar(unsigned int i, bool init) {
+
+        GLfloat * color = new GLfloat[3] { 1., 0., 0. };
+
+        // Get random percent of the road (0% left side of the road; 10% right side of the road)
+        float percentOfXRoad = (std::rand() % 100 + 1) / 100.;
+
+        GLfloat * scopeRoad = new GLfloat[2] { (car->getWidth() - ground->getRoadWidth())/2, (ground->getRoadWidth() - car->getWidth())/2};
+
+        // Set the opposite car position
+        float * pos = new float[3];
+        pos[0] = scopeRoad[0] + percentOfXRoad * (scopeRoad[1] - scopeRoad[0]);
+        pos[1] = 1.;
+        distBetOppCars = (ground->getRoadHeight() + CAMERA_Z_POSITION) * (i + 1 + NB_OPPOSITE_CARS)/NB_OPPOSITE_CARS;
+        // If initialisation of game, generate other car further
+        pos[2] = !init ? ground->getRoadHeight() : distBetOppCars;
+
+        Car * oppositeCar = new Car(color);
+        oppositeCar->setPosition(pos);
+
+        *(oppositeCars + i) = oppositeCar;
+}
+
+
+/*
+ * Display opposite cars stored in oppositeCars array
+ *
+ * @return void
+ */
+void MyGLWidget::displayCars() {
+
+    // For all cars stored in array
+    for(unsigned int i = 0; i < NB_OPPOSITE_CARS; i++) {
+        // Save main matrix
+        glPushMatrix();
+        // Rotate car
+        glRotatef(180, 0, 1, 0);
+
+        // Get car in array
+        Car * currentCar = *(oppositeCars + i);
+        // Decrease car's depth
+        currentCar->decreaseZ(ground->getRoadSpeed() + 3.5);
+        float * pos = currentCar->getPosition();
+
+        if(pos[2] <  - CAMERA_Z_POSITION) generateCar(i);
+
+        // Translate position matrix
+        glTranslated(pos[0], pos[1], pos[2]);
+        // Resfresh car printing
+        currentCar->Display(m_TimeElapsed);
+
+        // Load main matrix
+        glPopMatrix();
+    }
+}
+
+
+/*
+ * Check if there is colision cars
+ *
+ * @return void
+ */
+void MyGLWidget::checkCollison() {
+    /* Get main car current position */
+    float xCarPos = -left_right; // Invert pos to compare to opposite
+    float zCarPos = -18.;
+
+    for (unsigned int i = 0; i < NB_OPPOSITE_CARS; i++) {
+
+        float * oppPos = oppositeCars[i]->getPosition();
+
+        if (
+                (-oppPos[2] - oppositeCars[i]->getHeight() >= zCarPos - car->getHeight()/2
+                 && -oppPos[2] - oppositeCars[i]->getHeight() <= zCarPos + car->getHeight()/2.
+                 ||-oppPos[2] + oppositeCars[i]->getHeight() >= zCarPos - car->getHeight()/2
+                 && -oppPos[2] + oppositeCars[i]->getHeight() <= zCarPos + car->getHeight()/2)
+                && (oppPos[0] <= xCarPos
+                 && oppPos[0] + oppositeCars[i]->getWidth() > xCarPos
+                 || oppPos[0] < xCarPos + car->getWidth()
+                 && oppPos[0] + oppositeCars[i]->getWidth() >= xCarPos + car->getWidth())
+            ) {
+                exit(0);
+        }
+    }
 }

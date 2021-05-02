@@ -1,14 +1,16 @@
 #include "Ground.h"
 
+Ground::Ground(uint64_t iTimeElapsed){
 
-Ground::Ground(){
+    roadSpeed = (iTimeElapsed % 10) / 10.;
+    grassSpeed = (iTimeElapsed % 15) / 15.;
 
     // Textures
     QImage grass = QGLWidget::convertToGLFormat(QImage(":/grass.jpg"));
     QImage sky = QGLWidget::convertToGLFormat(QImage(":/sky.jpg"));
     QImage road = QGLWidget::convertToGLFormat(QImage(":/road.jpg"));
 
-    glGenTextures(3,TextureID);
+    glGenTextures(3, TextureID);
 
     // sky texture
     glBindTexture(GL_TEXTURE_2D, TextureID[0]);
@@ -40,10 +42,7 @@ Ground::~Ground(){
     delete [] TextureID;
 }
 
-void Ground::Display(uint64_t iTimeElapsed){
-
-    double trans = (iTimeElapsed % 10) / 10.;
-    double trans1 = (iTimeElapsed % 15) / 15.;
+void Ground::Display(){
 
     glEnable(GL_TEXTURE_2D);
     // Bind sky
@@ -67,10 +66,10 @@ void Ground::Display(uint64_t iTimeElapsed){
     // draw the grass
     glBegin(GL_QUADS);
     //glColor3ub(0,100,0);
-    glTexCoord2f(0,5 +trans1);glVertex3f(-200.0f,0.0f,-200.f);
-    glTexCoord2f(0,0 +trans1);glVertex3f(-200.0f,0.0f,60.f);
-    glTexCoord2f(5,0 +trans1);glVertex3f(200.0f,0.0f,60.f);
-    glTexCoord2f(5,5 +trans1);glVertex3f(200.0f,0.0f,-200.f);
+    glTexCoord2f(0,5 + grassSpeed);glVertex3f(-200.0f,0.0f,-200.f);
+    glTexCoord2f(0,0 + grassSpeed);glVertex3f(-200.0f,0.0f,60.f);
+    glTexCoord2f(5,0 + grassSpeed);glVertex3f(200.0f,0.0f,60.f);
+    glTexCoord2f(5,5 + grassSpeed);glVertex3f(200.0f,0.0f,-200.f);
     glEnd();
 
     glDisable(GL_TEXTURE_2D);
@@ -84,10 +83,10 @@ void Ground::Display(uint64_t iTimeElapsed){
     // draw the ground
     glBegin(GL_QUADS);
     //glColor3ub(100,100,100);
-    glTexCoord2f(0,0 + trans);glVertex3f(25.0f,0.1f,60.f);
-    glTexCoord2f(1,0 + trans);glVertex3f(-25.0f,0.1f,60.f);
-    glTexCoord2f(1,10 + trans);glVertex3f(-25.0f,0.1f,-200.f);
-    glTexCoord2f(0,10 + trans);glVertex3f(25.0f,0.1f,-200.f);
+    glTexCoord2f(0,0 + roadSpeed);glVertex3f(25.0f,0.1f,60.f);
+    glTexCoord2f(1,0 + roadSpeed);glVertex3f(-25.0f,0.1f,60.f);
+    glTexCoord2f(1,10 + roadSpeed);glVertex3f(-25.0f,0.1f,-200.f);
+    glTexCoord2f(0,10 + roadSpeed);glVertex3f(25.0f,0.1f,-200.f);
     glEnd();
 
     glDisable(GL_TEXTURE_2D);
