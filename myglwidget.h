@@ -1,6 +1,7 @@
 #include "Car.h"
-
 #include "barrel.h"
+#include "fuelbar.h"
+
 #include <QOpenGLWidget>
 #include <GL/glu.h>
 #include <QKeyEvent>
@@ -10,8 +11,11 @@
 class MyGLWidget : public QOpenGLWidget
 {
 private:
-    const float CAMERA_Z_POSITION = 60.;
+    // Const declaration
+    const unsigned int WIN = 900;
     const unsigned int NB_OPPOSITE_CARS = 3;
+
+    float * CAM_POS = new float[3]{0.,25., 60.};
 
     double left_right = 0.;
 
@@ -20,6 +24,7 @@ private:
 
     Ground * ground;
     Barrel * barrel;
+    FuelBar * fuelBar;
     Car * car;
 
     Car ** oppositeCars;
@@ -44,4 +49,5 @@ private:
     void displayCars();
     // Check if there is a collision
     void checkCollison();
+    void PrintTimer();
 };
