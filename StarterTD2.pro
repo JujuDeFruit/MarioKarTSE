@@ -23,11 +23,13 @@ TARGET 	  = StarterTD2
 SOURCES += main.cpp myglwidget.cpp \
     Car.cpp \
     Ground.cpp \
-    barrel.cpp
+    barrel.cpp \
+    fuelbar.cpp
 HEADERS += myglwidget.h \
     Car.h \
     Ground.h \
-    barrel.h
+    barrel.h \
+    fuelbar.h
 
 RESOURCES += \
     res/textures.qrc

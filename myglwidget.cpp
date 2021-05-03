@@ -16,9 +16,6 @@
  */
 MyGLWidget::MyGLWidget(QWidget * parent) : QOpenGLWidget(parent)
 {
-    // Const declaration
-    const unsigned int WIN = 900;
-
     // Window settings
     setFixedSize(WIN, WIN);
     move(QApplication::desktop()->screen()->rect().center() - rect().center());
@@ -39,6 +36,8 @@ MyGLWidget::MyGLWidget(QWidget * parent) : QOpenGLWidget(parent)
 
     m_AnimationTimer.setInterval(15);
     m_AnimationTimer.start();
+
+    fuelBar = new FuelBar(CAM_POS);
 }
 
 
@@ -102,16 +101,20 @@ void MyGLWidget::paintGL()
 
     // Set the camera
              //camX camY camZ cibleX cibleY cibleZ vecX vecY vecZ
-    gluLookAt(0.,25., CAMERA_Z_POSITION,0.,0.,0.,0.,1.,0.);
+    gluLookAt(CAM_POS[0], CAM_POS[1], CAM_POS[2],0.,0.,0.,0.,1.,0.);
     //gluLookAt(0.,150., 0,0.,0.,0.,0.,0.,1.);
 
-    // Affichage de la route
+    // Display road
     ground = new Ground(m_TimeElapsed);
     ground->Display();
 
-    // Print barrels
+    // Display barrels
     barrel = new Barrel();
     barrel->Display(m_TimeElapsed, ground);
+
+    fuelBar->Decrease(.2);
+    fuelBar->Display();
+    if (fuelBar->GetValue() == 0.0) exit(0);
 
     glPushMatrix();
     // Print main car
@@ -185,7 +188,7 @@ void MyGLWidget::generateCar(unsigned int i, bool init) {
         float * pos = new float[3];
         pos[0] = scopeRoad[0] + percentOfXRoad * (scopeRoad[1] - scopeRoad[0]);
         pos[1] = 1.;
-        distBetOppCars = (ground->getRoadHeight() + CAMERA_Z_POSITION) * (i + 1 + NB_OPPOSITE_CARS)/NB_OPPOSITE_CARS;
+        distBetOppCars = (ground->getRoadHeight() + CAM_POS[2]) * (i + 1 + NB_OPPOSITE_CARS)/NB_OPPOSITE_CARS;
         // If initialisation of game, generate other car further
         pos[2] = !init ? ground->getRoadHeight() : distBetOppCars;
 
@@ -216,7 +219,7 @@ void MyGLWidget::displayCars() {
         currentCar->decreaseZ(ground->getRoadSpeed() + 3.5);
         float * pos = currentCar->getPosition();
 
-        if(pos[2] <  - CAMERA_Z_POSITION) generateCar(i);
+        if(pos[2] <  - CAM_POS[2]) generateCar(i);
 
         // Translate position matrix
         glTranslated(pos[0], pos[1], pos[2]);
@@ -256,4 +259,15 @@ void MyGLWidget::checkCollison() {
                 exit(0);
         }
     }
+}
+
+
+void MyGLWidget::PrintTimer()
+{
+  /*glColor3f(1., 1., 1.);
+  glRasterPos2f(0, 0);
+  char * timer, font;
+  for (int i = 0; i < (int)strlen(timer); i++) {
+    glutBitmapCharacter(font, timer[i]);
+  }*/
 }
