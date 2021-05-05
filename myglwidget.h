@@ -30,6 +30,8 @@ private:
     Car ** oppositeCars;
     GLfloat distBetOppCars;
 
+    bool m_barrelPressed = false;
+
 public:
     // Constructeur
     MyGLWidget(QWidget * parent = nullptr);
@@ -50,4 +52,6 @@ private:
     // Check if there is a collision
     void checkCollison();
     void PrintTimer();
+
+    void mousePressEvent(QMouseEvent* event);
 };

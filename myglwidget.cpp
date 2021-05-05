@@ -6,6 +6,7 @@
 #include <windows.h>
 #include <stdlib.h>
 #include <time.h>
+#include <QDebug>
 
 #include <iostream>
 
@@ -110,7 +111,8 @@ void MyGLWidget::paintGL()
 
     // Display barrels
     barrel = new Barrel();
-    barrel->Display(m_TimeElapsed, ground);
+    barrel->Display(m_TimeElapsed, ground,m_barrelPressed);
+    m_barrelPressed = false;
 
     fuelBar->Decrease(.2);
     fuelBar->Display();
@@ -270,4 +272,67 @@ void MyGLWidget::PrintTimer()
   for (int i = 0; i < (int)strlen(timer); i++) {
     glutBitmapCharacter(font, timer[i]);
   }*/
+}
+
+
+void MyGLWidget::mousePressEvent(QMouseEvent *event)
+{
+    if(event->button() == Qt::LeftButton){
+        GLint hits;
+        GLuint selectBuf[512];
+        glSelectBuffer(512, selectBuf);
+
+        glRenderMode(GL_SELECT);
+        glInitNames();
+        glPushName(0);
+
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+
+        GLint viewport[4];
+        glGetIntegerv(GL_VIEWPORT, viewport);
+        gluPickMatrix(event->x(), (viewport[3] - event->y()), 5.0, 5.0, viewport);
+
+        gluPerspective(70.f, width()/height(), 0.1f, 300.f);
+
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+
+        //camX camY camZ cibleX cibleY cibleZ vecX vecY vecZ
+        gluLookAt(0.,25.,60.,0.,0.,0.,0.,1.,0.);
+
+        glLoadName(1);
+
+        // Draw a drum shaped figure at the drums placement to be clicked
+        GLUquadric* quadrique = gluNewQuadric();
+        gluQuadricDrawStyle(quadrique, GLU_FILL);
+
+        glPushMatrix();
+        glTranslated(- ground->getRoadWidth()/2 - 1., 5.f, -200. + ((uint64_t)m_TimeElapsed % 260));
+        barrel->drawBarrel(quadrique);
+        glPopMatrix();
+
+        glPushMatrix();
+        glTranslated(ground->getRoadWidth()/2 + 1., 5.f, -250. + ((uint64_t)m_TimeElapsed % 310));
+        barrel->drawBarrel(quadrique);
+        glPopMatrix();
+
+        glPushMatrix();
+        glTranslated(ground->getRoadWidth()/2 + 1., 5.f, -330. + ((uint64_t)m_TimeElapsed % 390));
+        barrel->drawBarrel(quadrique);
+        glPopMatrix();
+
+        gluDeleteQuadric(quadrique);
+
+        glFlush();
+
+        hits = glRenderMode(GL_RENDER);
+        qDebug()<<hits;
+        if (hits == 1){
+            m_barrelPressed = true;
+            fuelBar->Fill();
+            event->accept();
+            update();
+        }
+    }
 }
