@@ -8,6 +8,7 @@ class Barrel
 {
 private:
     GLuint* TextureID = new GLuint[1];
+    bool prevClicked_ = false;
 
 public:
     // Constructeur avec parametres
@@ -17,7 +18,7 @@ public:
     ~Barrel();
 
     // Methode d'affichage
-     void Display(uint64_t, Ground *);
+     void Display(uint64_t, Ground *, bool);
      static void drawBarrel(GLUquadric *);
 
 };

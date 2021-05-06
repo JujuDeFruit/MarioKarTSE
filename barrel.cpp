@@ -34,7 +34,7 @@ Barrel::~Barrel(){
  * @params ground : Ground pointer
  * @return void
  */
-void Barrel::Display(uint64_t iTimeElapsed, Ground * ground) {
+void Barrel::Display(uint64_t iTimeElapsed, Ground * ground,  bool barrelPressed) {
 
      glDisable(GL_LIGHTING);
      glEnable(GL_TEXTURE_2D);
@@ -46,7 +46,22 @@ void Barrel::Display(uint64_t iTimeElapsed, Ground * ground) {
      // bind texture
      glBindTexture(GL_TEXTURE_2D, TextureID[0]);
 
-     // Draw Barrel
+     // change barrels color upon click
+     if (barrelPressed || prevClicked_) {
+         glColor3f(100.f, 0.f, 0.f);
+         prevClicked_ = true;
+     } else {
+         glColor3f(100.f, 100.f, 100.f);
+     }
+
+     if (iTimeElapsed % 260 == 0 ) {
+         glColor3f(100.f, 100.f, 100.f);
+         prevClicked_ = false;
+     }
+
+
+
+     // Draw Barrels
      glPushMatrix();
      glTranslated(- ground->getRoadWidth()/2 - 1., 5.f, -200. + (iTimeElapsed % 260)); // trans
      drawBarrel(quadrique);
@@ -77,17 +92,17 @@ void Barrel::Display(uint64_t iTimeElapsed, Ground * ground) {
  */
 void Barrel::drawBarrel(GLUquadric * quadrique){
 
-    glPushMatrix();
+   // glPushMatrix();
     glRotated(90., 1., 0., 0.);        // rotate around axis
 
-    glColor3f(1.f, 1.f, 1.f);           // color Barrel
+   // glColor3f(1.f, 1.f, 1.f);           // color Barrel
 
     gluQuadricTexture(quadrique, GL_TRUE);  // Texture
     gluCylinder(quadrique,1.5, 1.5, 5., 40., 40.);
     gluQuadricTexture(quadrique, GL_FALSE);
 
-    glColor3f(1.f, 1.f, 0.f);
+   // glColor3f(1.f, 1.f, 0.f);
     gluDisk(quadrique,0.25,1.5,12,1);
 
-    glPopMatrix();
+   // glPopMatrix();
 }
