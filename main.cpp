@@ -1,15 +1,15 @@
 #include <QApplication>
-#include "myglwidget.h"
+#include "Widget.h"
 
 int main(int argc, char *argv[])
 {
-    // Creation de l'application QT
+    /* QT App */
     QApplication app(argc, argv);
 	
-	// Creation du widget opengl
-    MyGLWidget glWidget;
+    /* OpenGL Widget */
+    MKWidget glWidget;
     glWidget.show();
 
-    // Execution de l'application QT
+    /* QT App execution */
     return app.exec();
 }

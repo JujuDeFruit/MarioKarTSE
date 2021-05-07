@@ -1,54 +1,71 @@
 #include "Ground.h"
 
+
+/**
+ * @brief Ground::Ground
+ * Constructor of ground.
+ * @param iTimeElapsed : timer to synchronize on.
+ */
 Ground::Ground(uint64_t iTimeElapsed){
 
+    /* Define speeds */
     roadSpeed = (iTimeElapsed % 10) / 10.;
     grassSpeed = (iTimeElapsed % 15) / 15.;
 
-    // Textures
+    /* Load textures */
     QImage grass = QGLWidget::convertToGLFormat(QImage(":/grass.jpg"));
     QImage sky = QGLWidget::convertToGLFormat(QImage(":/sky.jpg"));
     QImage road = QGLWidget::convertToGLFormat(QImage(":/road.jpg"));
 
-    glGenTextures(3, TextureID);
+    /* Generate array of textures */
+    glGenTextures(3, textureID);
 
-    // sky texture
-    glBindTexture(GL_TEXTURE_2D, TextureID[0]);
+    /* Sky texture */
+    glBindTexture(GL_TEXTURE_2D, textureID[0]);
     glTexImage2D(GL_TEXTURE_2D, 0, 4, sky.width(), sky.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, sky.bits());
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-    // grass texture
-    glBindTexture(GL_TEXTURE_2D, TextureID[1]);
+    /* Grass texture */
+    glBindTexture(GL_TEXTURE_2D, textureID[1]);
     glTexImage2D(GL_TEXTURE_2D, 0, 4, grass.width(), grass.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, grass.bits());
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-    // road texture
-    glBindTexture(GL_TEXTURE_2D, TextureID[2]);
+    /* Road texture */
+    glBindTexture(GL_TEXTURE_2D, textureID[2]);
     glTexImage2D(GL_TEXTURE_2D, 0, 4, road.width(), road.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, road.bits());
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T, GL_REPEAT);
-
 }
 
+
+/**
+ * @brief Ground::~Ground
+ * Destructor of ground.
+ */
 Ground::~Ground(){
-    delete [] TextureID;
+    delete [] textureID;
 }
 
+
+/**
+ * @brief Ground::Display
+ * Display and refresh ground.
+ */
 void Ground::Display(){
 
     glEnable(GL_TEXTURE_2D);
-    // Bind sky
-    glBindTexture(GL_TEXTURE_2D, TextureID[0]);
+    /* Bind sky texture to array */
+    glBindTexture(GL_TEXTURE_2D, textureID[0]);
 
-    // draw the sky
+    /* Draw sky */
     glBegin(GL_QUADS);
     //glColor3ub(200,200,200);
     glTexCoord2f(0,2);glVertex3f(-200.0f,200.0f,-200.f);
@@ -60,10 +77,11 @@ void Ground::Display(){
     glDisable(GL_TEXTURE_2D);
 
     glEnable(GL_TEXTURE_2D);
-    // Bind grass
-    glBindTexture(GL_TEXTURE_2D, TextureID[1]);
 
-    // draw the grass
+    /* Bind grass */
+    glBindTexture(GL_TEXTURE_2D, textureID[1]);
+
+    /* Draw the grass */
     glBegin(GL_QUADS);
     //glColor3ub(0,100,0);
     glTexCoord2f(0,5 + grassSpeed);glVertex3f(-200.0f,0.0f,-200.f);
@@ -75,12 +93,11 @@ void Ground::Display(){
     glDisable(GL_TEXTURE_2D);
 
     glEnable(GL_TEXTURE_2D);
-    // Bind ground
-    glBindTexture(GL_TEXTURE_2D, TextureID[2]);
 
+    /* Bind ground */
+    glBindTexture(GL_TEXTURE_2D, textureID[2]);
 
-
-    // draw the ground
+    /* Draw the ground */
     glBegin(GL_QUADS);
     //glColor3ub(100,100,100);
     glTexCoord2f(0,0 + roadSpeed);glVertex3f(25.0f,0.1f,60.f);
@@ -90,5 +107,4 @@ void Ground::Display(){
     glEnd();
 
     glDisable(GL_TEXTURE_2D);
-
 }

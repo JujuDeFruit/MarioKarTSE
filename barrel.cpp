@@ -1,17 +1,18 @@
-#include "barrel.h"
+#include "Barrel.h"
 
-/*
+/**
  * Constructor of Barrel
  */
 Barrel::Barrel(){
 
-    // Texture
+    /* Textures */
     QImage s_fuel=QGLWidget::convertToGLFormat(QImage(":/fuel.jpg"));
 
-    glGenTextures(1, TextureID);
+    /* Generate an array of textures */
+    glGenTextures(1, textureID);
 
-    // Barrel texture
-    glBindTexture(GL_TEXTURE_2D, TextureID[0]);
+    /* Load barrel textures */
+    glBindTexture(GL_TEXTURE_2D, textureID[0]);
     glTexImage2D(GL_TEXTURE_2D, 0, 4, s_fuel.width(), s_fuel.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, s_fuel.bits());
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -20,33 +21,33 @@ Barrel::Barrel(){
 
 }
 
-/*
+/**
  * Delete textures
  */
 Barrel::~Barrel(){
-    delete [] TextureID;
+    delete [] textureID;
 }
 
-/*
+/**
  * Display Barrels
  *
- * @params iTimeElapsed : timer
- * @params ground : Ground pointer
- * @return void
+ * @param iTimeElapsed : timer
+ * @param ground : Ground pointer
+ * @param barrelPressed : is the barrel pressed by user ?
  */
 void Barrel::Display(uint64_t iTimeElapsed, Ground * ground,  bool barrelPressed) {
 
      glDisable(GL_LIGHTING);
      glEnable(GL_TEXTURE_2D);
 
-     // Quadrique
+     /* Barrel quadric */
      GLUquadric* quadrique = gluNewQuadric();
      gluQuadricDrawStyle(quadrique, GLU_FILL);
 
-     // bind texture
-     glBindTexture(GL_TEXTURE_2D, TextureID[0]);
+     /* Bind textures to array of textures */
+     glBindTexture(GL_TEXTURE_2D, textureID[0]);
 
-     // change barrels color upon click
+     /* Change barrels color upon click */
      if (barrelPressed || prevClicked_) {
          glColor3f(100.f, 0.f, 0.f);
          prevClicked_ = true;
@@ -61,41 +62,40 @@ void Barrel::Display(uint64_t iTimeElapsed, Ground * ground,  bool barrelPressed
 
 
 
-     // Draw Barrels
+     /* Draw Barrels */
      glPushMatrix();
-     glTranslated(- ground->getRoadWidth()/2 - 1., 5.f, -200. + (iTimeElapsed % 260)); // trans
+     glTranslated(- ground->getRoadWidth()/2 - 1., 5.f, -200. + (iTimeElapsed % 260)); // Translation
      drawBarrel(quadrique);
      glPopMatrix();
 
      glPushMatrix();
-     glTranslated(ground->getRoadWidth()/2 + 1., 5.f, -250. + (iTimeElapsed % 310)); // trans
+     glTranslated(ground->getRoadWidth()/2 + 1., 5.f, -250. + (iTimeElapsed % 310)); // Translation
      drawBarrel(quadrique);
      glPopMatrix();
 
      glPushMatrix();
-     glTranslated(ground->getRoadWidth()/2 + 1., 5.f, -330. + (iTimeElapsed % 390)); // trans
+     glTranslated(ground->getRoadWidth()/2 + 1., 5.f, -330. + (iTimeElapsed % 390)); // Translation
      drawBarrel(quadrique);
      glPopMatrix();
 
-     gluDeleteQuadric(quadrique);     // remove barrel when out of frame
+     gluDeleteQuadric(quadrique);     // Remove barrel when out of frame
 
      glDisable(GL_TEXTURE_2D);
      glEnable(GL_LIGHTING);
 
 }
 
-/*
+/**
  * Draw barrel to define it on ground
  *
- * @params quadrique : barrel quadrique object
- * @return void
+ * @param quadrique : barrel quadric object
  */
 void Barrel::drawBarrel(GLUquadric * quadrique){
 
    // glPushMatrix();
-    glRotated(90., 1., 0., 0.);        // rotate around axis
+    glRotated(90., 1., 0., 0.);        // Rotate around axis
 
-   // glColor3f(1.f, 1.f, 1.f);           // color Barrel
+   // glColor3f(1.f, 1.f, 1.f);           // Color Barrel
 
     gluQuadricTexture(quadrique, GL_TRUE);  // Texture
     gluCylinder(quadrique,1.5, 1.5, 5., 40., 40.);

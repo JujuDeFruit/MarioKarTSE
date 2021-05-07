@@ -1,26 +1,29 @@
+#ifndef BARREL_H
+#define BARREL_H
+
 #include <qopengl.h>
 #include <GL/glu.h>
 #include <QGLWidget>
+
 #include "Ground.h"
 
-// Classe dediee pour la gestion des bidon
+/**
+ * Manage fuel barrels displayed along the road.
+ *
+ * @param textureID : contains all textures.
+ * @param prevClicked_ : contains event clicked.
+ */
 class Barrel
 {
 private:
-    GLuint* TextureID = new GLuint[1];
+    GLuint* textureID = new GLuint[1];
     bool prevClicked_ = false;
 
 public:
-    // Constructeur avec parametres
     Barrel();
-
-    // Destructeur
+    void Display(uint64_t, Ground *, bool);
+    static void drawBarrel(GLUquadric *);
     ~Barrel();
-
-    // Methode d'affichage
-     void Display(uint64_t, Ground *, bool);
-     static void drawBarrel(GLUquadric *);
-
 };
 
-
+# endif

@@ -1,4 +1,3 @@
-#include "myglwidget.h"
 #include <QApplication>
 #include <QDesktopWidget>
 #include <GL/glu.h>
@@ -8,58 +7,59 @@
 #include <time.h>
 #include <QDebug>
 
-#include <iostream>
+#include "Widget.h"
 
-/*
+/**
  * Constructor of main openGL Widget
  *
  * @param parent : parent widget
  */
-MyGLWidget::MyGLWidget(QWidget * parent) : QOpenGLWidget(parent)
+MKWidget::MKWidget(QOpenGLWidget * parent):QOpenGLWidget(parent)
 {
-    // Window settings
+    /* Window settings */
     setFixedSize(WIN, WIN);
     move(QApplication::desktop()->screen()->rect().center() - rect().center());
 
-    // Set interval to refresh window
+    /* Set interval to refresh window* */
     connect(&m_AnimationTimer,  &QTimer::timeout, [&] {
         m_TimeElapsed += 1.0f;
         update();
     });
 
-    // Initialize arrays of pointers of cars
+    /* Initialize arrays of pointers of cars */
     oppositeCars = new Car*[NB_OPPOSITE_CARS];
 
-    // Generate random seed
+    /* Generate random seed */
     std::srand(time(0));
-    // Generate cars and fill array
+
+    /* Generate cars and fill array of opposite cars */
     for(unsigned int i = 0; i < NB_OPPOSITE_CARS; i++) generateCar(i, true);
 
+    /* Generate fuel bar */
+    fuelBar = new FuelBar(CAM_POS);
+
+    /* Create and set timer */
     m_AnimationTimer.setInterval(15);
     m_AnimationTimer.start();
-
-    fuelBar = new FuelBar(CAM_POS);
 }
 
 
-/*
+/**
  * Overriding OpenGL initialization method
- *
- * @return void
  */
-void MyGLWidget::initializeGL()
+void MKWidget::initializeGL()
 {
-    // changer la couleur du fond
-    glClearColor(0.5f,0.5f,0.5f,1.0f); // gris
+    /* Change background color */
+    glClearColor(0.5f,0.5f,0.5f,1.0f); // grey
 
     glEnable(GL_DEPTH_TEST);
 
-    // Light activation
+    /* Light activation */
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
     glEnable(GL_LIGHT1);
 
-    // ambiant lignt
+    /* Ambiant light */
     GLfloat light_color_tab[] = { 1.f, 1.f, 1.f, 0.f};
     glLightfv(GL_LIGHT0, GL_AMBIENT, light_color_tab);
 
@@ -69,185 +69,184 @@ void MyGLWidget::initializeGL()
 }
 
 
-/*
+/**
  * Overriding OpenGL resizing window method.
  *
- * @params width : window width
- * @params height : window height
- * @return void
+ * @param width : window width
+ * @param height : window height
  */
-void MyGLWidget::resizeGL(int width, int height)
+void MKWidget::resizeGL(int width, int height)
 {
-    // Viewport definiton, printing area
+    /* Viewport definiton, printing area */
     glViewport(0, 0, width, height);
 }
 
 
-/*
- * Overriding OpenGL printing method
- *
- * @return void
+/**
+ * Overriding OpenGL printing method.
  */
-void MyGLWidget::paintGL()
+void MKWidget::paintGL()
 {
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-    // Reinitialisation de la matrice courante
+    /* Reset current matrix. */
     glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();                           // affecter la matrice identité à la matrice courante
+    glLoadIdentity();                           // Load identity matrix and set it as current.
     gluPerspective(70.f, 1, 0.1f, 500.f);
 
-    glMatrixMode(GL_MODELVIEW);                 // pour placer nos objets dans un monde 3D
+    glMatrixMode(GL_MODELVIEW);                 // Set items in 3D representation.
     glLoadIdentity();
 
-    // Set the camera
-             //camX camY camZ cibleX cibleY cibleZ vecX vecY vecZ
+    // Set camera
+             //camX camY camZ targetX targetY targetZ vecX vecY vecZ.
     gluLookAt(CAM_POS[0], CAM_POS[1], CAM_POS[2],0.,0.,0.,0.,1.,0.);
     //gluLookAt(0.,150., 0,0.,0.,0.,0.,0.,1.);
 
-    // Display road
+    /* Display ground. */
     ground = new Ground(m_TimeElapsed);
     ground->Display();
 
-    // Display barrels
+    /* Display barrel */
     barrel = new Barrel();
     barrel->Display(m_TimeElapsed, ground,m_barrelPressed);
     m_barrelPressed = false;
 
+    /* Decrease fuel bar */
     fuelBar->Decrease(.2);
     fuelBar->Display();
+    /* Exit if fuel bar is empty */
     if (fuelBar->GetValue() == 0.0) exit(0);
 
     glPushMatrix();
-    // Print main car
+    /* Print main car */
     glTranslated(left_right ,1., 0.);
 
+    /* Main car */
     car = new Car();
     car->Display(m_TimeElapsed);
+
     glPopMatrix();
 
+    /* Display opposite cars and check for collisions. */
     displayCars();
-
     checkCollison();
 }
 
 
-/*
+/**
  * Keyboard interaction method
  *
  * @param event : key pressed event
- * @return void
  */
-void MyGLWidget::keyPressEvent(QKeyEvent * event)
+void MKWidget::keyPressEvent(QKeyEvent * event)
 {
     const float roadWidth = ground->getRoadWidth();
     const float carWidth = car->getWidth();
 
     switch(event->key())
     {
-        // Move car to left side, and make sure car does not get out of the road
+        /* Move car to left side, and make sure car does not get out of the road. */
         case Qt::Key_Left:
               left_right = left_right - carWidth / 2 > - roadWidth / 2 ? left_right - 2. : left_right;
               break;
 
-        // Move car to right side, and make sure car does not get out of the road
+        /* Move car to right side, and make sure car does not get out of the road. */
         case Qt::Key_Right:
               left_right = left_right + carWidth / 2 < roadWidth / 2 ? left_right + 2. : left_right;
               break;
 
-        // Cas par defaut
+        /* Default case. */
         default:
         {
-            // Ignorer l'evenement
+            /* Ignore event. */
             event->ignore();
             return;
         }
     }
 
-    // Acceptation de l'evenement et mise a jour de la scene
+    /* Accept event and update scene */
     event->accept();
     update();
 }
 
 
-/*
- * Generate car coming from opposite side
+/**
+ * Generate car coming from opposite side.
  *
  * @param i : index of array to generate car
  * @param init : boolean to set initialisation of the game or not
- * @return void
  */
-void MyGLWidget::generateCar(unsigned int i, bool init) {
+void MKWidget::generateCar(unsigned int i, bool init) {
 
         GLfloat * color = new GLfloat[3] { 1., 0., 0. };
 
-        // Get random percent of the road (0% left side of the road; 10% right side of the road)
+        /* Get random percent of the road (0% left side of the road; 10% right side of the road). */
         float percentOfXRoad = (std::rand() % 100 + 1) / 100.;
 
         GLfloat * scopeRoad = new GLfloat[2] { (car->getWidth() - ground->getRoadWidth())/2, (ground->getRoadWidth() - car->getWidth())/2};
 
-        // Set the opposite car position
+        /* Set the opposite car position. */
         float * pos = new float[3];
         pos[0] = scopeRoad[0] + percentOfXRoad * (scopeRoad[1] - scopeRoad[0]);
         pos[1] = 1.;
         distBetOppCars = (ground->getRoadHeight() + CAM_POS[2]) * (i + 1 + NB_OPPOSITE_CARS)/NB_OPPOSITE_CARS;
-        // If initialisation of game, generate other car further
+        /* If initialisation of game, generate other car further */
         pos[2] = !init ? ground->getRoadHeight() : distBetOppCars;
 
+        /* Create opposite car and set position. */
         Car * oppositeCar = new Car(color);
         oppositeCar->setPosition(pos);
 
+        /* Fill array. */
         *(oppositeCars + i) = oppositeCar;
 }
 
 
-/*
- * Display opposite cars stored in oppositeCars array
- *
- * @return void
+/**
+ * Display opposite cars stored in oppositeCars array.
  */
-void MyGLWidget::displayCars() {
+void MKWidget::displayCars() {
 
-    // For all cars stored in array
+    /* For all cars stored in array. */
     for(unsigned int i = 0; i < NB_OPPOSITE_CARS; i++) {
-        // Save main matrix
+        /* Save main matrix. */
         glPushMatrix();
-        // Rotate car
+        /* Rotate car. */
         glRotatef(180, 0, 1, 0);
 
-        // Get car in array
+        /* Get car in array. */
         Car * currentCar = *(oppositeCars + i);
-        // Decrease car's depth
+        /* Decrease car's depth. */
         currentCar->decreaseZ(ground->getRoadSpeed() + 3.5);
         float * pos = currentCar->getPosition();
 
         if(pos[2] <  - CAM_POS[2]) generateCar(i);
 
-        // Translate position matrix
+        /* Translate position matrix. */
         glTranslated(pos[0], pos[1], pos[2]);
-        // Resfresh car printing
+        /* Resfresh car printing. */
         currentCar->Display(m_TimeElapsed);
 
-        // Load main matrix
+        /* Load main matrix. */
         glPopMatrix();
     }
 }
 
 
-/*
- * Check if there is colision cars
- *
- * @return void
+/**
+ * Check if there is colision cars.
  */
-void MyGLWidget::checkCollison() {
+void MKWidget::checkCollison() {
     /* Get main car current position */
     float xCarPos = -left_right; // Invert pos to compare to opposite
     float zCarPos = -18.;
 
+    /* Check for all opposite cars. */
     for (unsigned int i = 0; i < NB_OPPOSITE_CARS; i++) {
 
         float * oppPos = oppositeCars[i]->getPosition();
 
+        /* Check for collisions with main car. */
         if (
                 (-oppPos[2] - oppositeCars[i]->getHeight() >= zCarPos - car->getHeight()/2
                  && -oppPos[2] - oppositeCars[i]->getHeight() <= zCarPos + car->getHeight()/2.
@@ -263,8 +262,11 @@ void MyGLWidget::checkCollison() {
     }
 }
 
-
-void MyGLWidget::PrintTimer()
+/**
+ * @brief MKWidget::PrintTimer
+ * Print timer on screen.
+ */
+void MKWidget::PrintTimer()
 {
   /*glColor3f(1., 1., 1.);
   glRasterPos2f(0, 0);
@@ -274,8 +276,12 @@ void MyGLWidget::PrintTimer()
   }*/
 }
 
-
-void MyGLWidget::mousePressEvent(QMouseEvent *event)
+/**
+ * @brief MKWidget::mousePressEvent
+ * Override mousPressEvent method.
+ * @param event : mouse press event.
+ */
+void MKWidget::mousePressEvent(QMouseEvent *event)
 {
     if(event->button() == Qt::LeftButton){
         GLint hits;
@@ -298,12 +304,12 @@ void MyGLWidget::mousePressEvent(QMouseEvent *event)
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
 
-        //camX camY camZ cibleX cibleY cibleZ vecX vecY vecZ
+        /* camX camY camZ targetX targetY targetZ vecX vecY vecZ. */
         gluLookAt(0.,25.,60.,0.,0.,0.,0.,1.,0.);
 
         glLoadName(1);
 
-        // Draw a drum shaped figure at the drums placement to be clicked
+        /* Draw a drum shaped figure at the drums placement to be clicked. */
         GLUquadric* quadrique = gluNewQuadric();
         gluQuadricDrawStyle(quadrique, GLU_FILL);
 
@@ -327,7 +333,7 @@ void MyGLWidget::mousePressEvent(QMouseEvent *event)
         glFlush();
 
         hits = glRenderMode(GL_RENDER);
-        qDebug()<<hits;
+        //qDebug()<<hits;
         if (hits == 1){
             m_barrelPressed = true;
             fuelBar->Fill();

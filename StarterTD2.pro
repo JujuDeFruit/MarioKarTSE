@@ -20,16 +20,16 @@ else {
 TARGET 	  = StarterTD2
 
 # fichiers sources/headers/ressources
-SOURCES += main.cpp myglwidget.cpp \
+SOURCES += Main.cpp Widget.cpp \
     Car.cpp \
     Ground.cpp \
-    barrel.cpp \
-    fuelbar.cpp
-HEADERS += myglwidget.h \
+    Barrel.cpp \
+    FuelBar.cpp
+HEADERS += Widget.h \
     Car.h \
     Ground.h \
-    barrel.h \
-    fuelbar.h
+    Barrel.h \
+    FuelBar.h
 
 RESOURCES += \
     res/textures.qrc

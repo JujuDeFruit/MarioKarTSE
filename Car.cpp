@@ -1,16 +1,30 @@
 #include "Car.h"
 
+
+/**
+ * @brief Car::Car
+ * Constructor of car object.
+ *
+ * @param color_ color of the car to display.
+ */
 Car::Car(GLfloat * color_){
     color = color_;
 }
 
-Car::~Car(){}
 
+/**
+ * @brief Car::Display
+ * Display and refresh car on the screen.
+ *
+ * @param iTimeElapsed : timer to synchronize displaying.
+ */
 void Car::Display(uint64_t iTimeElapsed) {
 
     glPushMatrix();
 
-    // Car material
+    /* Car settings */
+
+    /** Material reaction **/
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, color);
     GLfloat ColorDiffuse_car[] = {0.4f, 0.4f, 0.4f };
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, ColorDiffuse_car);
@@ -19,10 +33,12 @@ void Car::Display(uint64_t iTimeElapsed) {
     GLfloat shininess_car[] = {76.8};
     glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, shininess_car);
 
-    // Draw Car
+    /* Draw Car */
     glBegin(GL_QUADS);
-    // ////////////////////////////// bottom part
-    // Front
+
+    /** Bottom part**/
+
+    /*** Front ***/
     glColor3ub(100,0,0);
     glNormal3f(0.f,0.f,1.f);
     glVertex3f(-3.0f,3.0f,-5.f);
@@ -30,7 +46,7 @@ void Car::Display(uint64_t iTimeElapsed) {
     glVertex3f(3.0f,0.0f,-5.f);
     glVertex3f(3.0f,3.0f,-5.f);
 
-    // Back
+    /*** Back ***/
     glColor3ub(100,0,0);
     glNormal3f(0.f,0.f,-1.f);
     glVertex3f(-3.0f,3.0f,-26.f);
@@ -38,7 +54,7 @@ void Car::Display(uint64_t iTimeElapsed) {
     glVertex3f(3.0f,0.0f,-26.f);
     glVertex3f(3.0f,3.0f,-26.f);
 
-    // Left
+    /*** Left ***/
     glColor3ub(100,0,0);
     glNormal3f(-1.f,0.f,0.f);
     glVertex3f(-3.0f,3.0f,-26.f);
@@ -46,7 +62,7 @@ void Car::Display(uint64_t iTimeElapsed) {
     glVertex3f(-3.0f,0.0f,-5.f);
     glVertex3f(-3.0f,3.0f,-5.f);
 
-    // Right
+    /*** Right ***/
     glColor3ub(100,0,0);
     glNormal3f(1.f,0.f,0.f);
     glVertex3f(3.0f,3.0f,-26.f);
@@ -54,7 +70,7 @@ void Car::Display(uint64_t iTimeElapsed) {
     glVertex3f(3.0f,0.0f,-5.f);
     glVertex3f(3.0f,3.0f,-5.f);
 
-    // Top
+    /*** Top ***/
     glColor3ub(0,100,100);
     glNormal3f(0.f,1.f,0.f);
     glVertex3f(-3.0f,3.0f,-26.f);
@@ -62,7 +78,7 @@ void Car::Display(uint64_t iTimeElapsed) {
     glVertex3f(3.0f,3.0f,-5.f);
     glVertex3f(3.0f,3.0f,-26.f);
 
-    // Bottom
+    /*** Bottom ***/
     glColor3ub(0,100,100);
     glNormal3f(0.f,-1.f,0.f);
     glVertex3f(-3.0f,0.0f,-26.f);
@@ -71,8 +87,9 @@ void Car::Display(uint64_t iTimeElapsed) {
     glVertex3f(3.0f,0.0f,-26.f);
 
 
-     // ////////////////////////////// top part
-    // Front
+    /** Top Part **/
+
+    //*** Front ***/
     glColor3ub(100,0,0);
     glNormal3f(0.f,0.5f,0.5f);
     glVertex3f(-3.0f,5.0f,-9.f);
@@ -80,7 +97,7 @@ void Car::Display(uint64_t iTimeElapsed) {
     glVertex3f(3.0f,3.0f,-8.f);
     glVertex3f(3.0f,5.0f,-9.f);
 
-    // Back
+    /*** Back ***/
     glColor3ub(100,0,0);
     glNormal3f(0.f,0.5f,-0.5f);
     glVertex3f(-3.0f,5.0f,-18.f);
@@ -88,7 +105,7 @@ void Car::Display(uint64_t iTimeElapsed) {
     glVertex3f(3.0f,3.0f,-20.f);
     glVertex3f(3.0f,5.0f,-18.f);
 
-    // Left
+    /*** Left ***/
     glColor3ub(100,0,0);
     glNormal3f(-1.f,0.f,0.f);
     glVertex3f(-3.0f,5.0f,-18.f);
@@ -96,7 +113,7 @@ void Car::Display(uint64_t iTimeElapsed) {
     glVertex3f(-3.0f,3.0f,-8.f);
     glVertex3f(-3.0f,5.0f,-9.f);
 
-    // Right
+    /*** Right ***/
     glColor3ub(100,0,0);
     glNormal3f(1.f,0.f,0.f);
     glVertex3f(3.0f,5.0f,-18.f);
@@ -104,7 +121,7 @@ void Car::Display(uint64_t iTimeElapsed) {
     glVertex3f(3.0f,3.0f,-8.f);
     glVertex3f(3.0f,5.0f,-9.f);
 
-    // Top
+    /*** Top ***/
     glColor3ub(0,100,100);
     glNormal3f(0.f,1.f,0.f);
     glVertex3f(-3.0f,5.0f,-18.f);
@@ -116,20 +133,21 @@ void Car::Display(uint64_t iTimeElapsed) {
 
     glPopMatrix();
 
-
-    // ////////////////////////// Girophare
+    /* Gyrophare */
+    /** Gyrophare Quadric **/
     GLUquadric* quadrique1 = gluNewQuadric();
     gluQuadricDrawStyle(quadrique1,GLU_FILL);
 
-    // Draw Gyro
+    /** Draw Gyrophare **/
     glPushMatrix();
     glTranslatef(-1.f,5.1f,-14.f);
     drawGirophare(quadrique1, iTimeElapsed);
+
     glPopMatrix();
 
-    // ////////////////////////////// Windows
+    /* Window settings */
 
-    // window Material
+    /** Material reaction **/
     GLfloat colorAmbiante_window[] = {0.0f, 0.0f, 0.0f, 1.f};
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, colorAmbiante_window);
     GLfloat colorDiffuse_window[] = {0.01f, 0.01f, 0.01f, 1.f};
@@ -141,10 +159,11 @@ void Car::Display(uint64_t iTimeElapsed) {
     GLfloat colorEmission_window[] = {0, 0, 0, 1.f};
     glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, colorEmission_window);
 
-    // Draw Window
+    /** Draw Window **/
 
     glBegin(GL_QUADS);
-    // Left Front
+
+    /*** Left Front ***/
     glColor3f(0.f,0.f,0.f);
     glNormal3f(-1.f,0.f,0.f);
     glVertex3f(-3.01f,4.8f,-17.7f);
@@ -152,7 +171,7 @@ void Car::Display(uint64_t iTimeElapsed) {
     glVertex3f(-3.001f,3.0f,-14.f);
     glVertex3f(-3.001f,4.8f,-14.f);
 
-    // Right Front
+    /*** Right Front ***/
     glColor3f(0.f,0.f,0.f);
     glNormal3f(1.f,0.f,0.f);
     glVertex3f(3.01f,4.8f,-17.7f);
@@ -160,7 +179,7 @@ void Car::Display(uint64_t iTimeElapsed) {
     glVertex3f(3.01f,3.0f,-14.f);
     glVertex3f(3.01f,4.8f,-14.f);
 
-    // Left Back
+    /*** Left Back ***/
     glColor3f(0.f,0.f,0.f);
     glNormal3f(-1.f,0.f,0.f);
     glVertex3f(-3.01f,4.8f,-13.5f);
@@ -168,7 +187,7 @@ void Car::Display(uint64_t iTimeElapsed) {
     glVertex3f(-3.01f,3.0f,-8.3f);
     glVertex3f(-3.01f,4.8f,-9.3f);
 
-    // Right Back
+    /*** Right Back ***/
     glColor3f(0.f,0.f,0.f);
     glNormal3f(1.f,0.f,0.f);
     glVertex3f(3.01f,4.8f,-13.5f);
@@ -176,7 +195,7 @@ void Car::Display(uint64_t iTimeElapsed) {
     glVertex3f(3.01f,3.0f,-8.3f);
     glVertex3f(3.01f,4.8f,-9.3f);
 
-    // Front
+    /*** Front ***/
     glColor3ub(0,0,0);
     glNormal3f(0.f,0.5f,-0.5f);
     glVertex3f(-2.8f,4.97f,-8.999f);
@@ -184,20 +203,22 @@ void Car::Display(uint64_t iTimeElapsed) {
     glVertex3f(2.8f,3.2f,-7.999f);
     glVertex3f(2.8f,4.97f,-8.999f);
 
-    // Back
+    /*** Back ***/
     glColor3ub(0,0,0);
     glNormal3f(1.f,0.5f,0.5f);
     glVertex3f(-2.8f,4.97f,-18.001f);
     glVertex3f(-2.8f,3.2f,-20.001f);
     glVertex3f(2.8f,3.2f,-20.001f);
     glVertex3f(2.8f,4.97f,-18.001f);
+
     glEnd();
 
 
-    // //////////////////////////////: Phares
+    /* Headlights */
 
     glBegin(GL_QUADS);
 
+    /** Headlights settings **/
     GLfloat colorAmbiante5_tab[] = {1.f, 0.10f, 0.01f, 1.f};
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, colorAmbiante5_tab);
     GLfloat colorDiffuse5_tab[] = {0.01f, 0.01f, 0.01f, 1.f};
@@ -210,7 +231,7 @@ void Car::Display(uint64_t iTimeElapsed) {
     glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, colorEmission5_tab);
 
 
-    // Front
+    /*** Front ***/
     glColor3ub(100,100,50);
     glNormal3f(0.f,0.f,1.f);
     glVertex3f(-2.5f,2.f,-4.99f);
@@ -225,7 +246,7 @@ void Car::Display(uint64_t iTimeElapsed) {
     glVertex3f(2.5f,1.f,-4.99f);
     glVertex3f(2.5f,2.f,-4.99f);
 
-    // Back
+    /*** Back ***/
     glColor3ub(100,100,50);
     glNormal3f(0.f,0.f,-1.f);
     glVertex3f(-2.5f,2.f,-26.0001f);
@@ -243,46 +264,50 @@ void Car::Display(uint64_t iTimeElapsed) {
     glEnd();
 
 
-    // /////////////////////////// Tiers
+    /* Tiers */
 
     GLUquadric* quadrique = gluNewQuadric();
-    gluQuadricDrawStyle(quadrique,GLU_FILL);
+    gluQuadricDrawStyle(quadrique, GLU_FILL);
 
-    // Front left wheel
+    /** Front left wheel **/
     glPushMatrix();
     glTranslatef(-3.2f,0.f,-20.f);
     drawTier(quadrique);
     glPopMatrix();
 
-    // Front right wheel
+    /** Front right wheel **/
     glPushMatrix();
     glTranslatef(2.8f,0.f,-20.f);
     drawTier(quadrique);
     glPopMatrix();
 
-    // Back left wheel
+    /** Back left wheel **/
     glPushMatrix();
     glTranslatef(-3.2f,0.f,-10.f);
     drawTier(quadrique);
     glPopMatrix();
 
-    // Back right wheel
+    /** Back right wheel **/
     glPushMatrix();
     glTranslatef(2.8f,0.f,-10.f);
     drawTier(quadrique);
     glPopMatrix();
 
 
-    // General light
+    /* General light */
     GLfloat colorAmbiante_[] = {0.9f, 0.9f, 0.9f, 1.f};
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, colorAmbiante_);
 }
 
 
-
-
+/**
+ * @brief Car::drawTier
+ * Draw tiers, and refresh them on the screen.
+ *
+ * @param quadrique to draw tier
+ */
 void Car::drawTier(GLUquadric* quadrique){
-    // Matériau
+    /* Material */
     GLfloat ambient_wheel[] = {0.f, 0.f, 0.f, 1.0f};
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient_wheel);
     GLfloat diffuse_wheel[] = {0.01f, 0.01f, 0.01f };
@@ -293,7 +318,7 @@ void Car::drawTier(GLUquadric* quadrique){
     glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, shininess_wheel);
 
     glPushMatrix();
-    glRotatef(90,0,1,0);   // rotation autour de l'axe y
+    glRotatef(90,0,1,0);   // Rotate around Y.
     glColor3ub(0.,0.,0.);
     gluCylinder(quadrique,1., 1., 0.5, 40., 40.); // base top height sliceV stackH
 
@@ -307,19 +332,19 @@ void Car::drawTier(GLUquadric* quadrique){
 }
 
 
-/*
+/**
  * Draw gyrophare on the car
  *
- * @params quadrique : quadrique to draw gyrophare
- * @params iTimeElapsed : timer
- * @return void
+ * @param quadrique : quadrique to draw gyrophare.
+ * @param iTimeElapsed : timer to synchronize on.
  */
 void Car::drawGirophare(GLUquadric* quadrique, uint64_t iTimeElapsed){
 
-    // light Gyro
+    /* light gyrophare */
     GLfloat light_tab[] = { -1.f,5.65f,-14.f, 1.f };
     glLightfv(GL_LIGHT1, GL_POSITION, light_tab);
 
+    /* Definae colors */
     GLfloat light_color_Red[] = { 1.f, 0.f, 0.f};
     GLfloat light_color_Blue[] = { 0.f, 0.f, 1.f};
     if (iTimeElapsed % 40 < 20) {
@@ -333,16 +358,15 @@ void Car::drawGirophare(GLUquadric* quadrique, uint64_t iTimeElapsed){
     }
 
     glPushMatrix();
-    glRotatef(90,-1,0,0);   // rotation autour de l'axe y
+    glRotatef(90,-1,0,0);   // Rotate around Y.
     glColor3f(.25f,.25f,.25f);
     gluSphere(quadrique, 0.5, 10, 10);
     glPopMatrix();
 }
 
-/*
+/**
  * Move opposite car to approach screen
  *
- * @params decrement : value to decrease z component of the car
- * @return void
+ * @param decrement : value to decrease z component of the car.
  */
 void Car::decreaseZ(float decrement) { position[2] = position[2] - decrement; }
