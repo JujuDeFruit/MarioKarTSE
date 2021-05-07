@@ -155,6 +155,9 @@ void MKWidget::keyPressEvent(QKeyEvent * event)
               left_right = left_right + carWidth / 2 < roadWidth / 2 ? left_right + 2. : left_right;
               break;
 
+        case Qt::Key_Q:
+              exit(0);
+
         /* Default case. */
         default:
         {
