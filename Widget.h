@@ -51,6 +51,7 @@ private:
     GLfloat distBetOppCars;
 
     bool m_barrelPressed = false;
+    bool activateMove = true;
 
 public:
     /* Constructor */
@@ -69,6 +70,7 @@ private:
     void displayCars();
     void checkCollison();
     void PrintTimer();
+    void StopAnimation();
 };
 
 # endif

@@ -143,17 +143,23 @@ void MKWidget::keyPressEvent(QKeyEvent * event)
     const float roadWidth = ground->getRoadWidth();
     const float carWidth = car->getWidth();
 
+
     switch(event->key())
     {
         /* Move car to left side, and make sure car does not get out of the road. */
         case Qt::Key_Left:
-              left_right = left_right - carWidth / 2 > - roadWidth / 2 ? left_right - 2. : left_right;
+              left_right = left_right - carWidth / 2 > - roadWidth / 2 && activateMove ? left_right - 2. : left_right;
               break;
 
         /* Move car to right side, and make sure car does not get out of the road. */
         case Qt::Key_Right:
-              left_right = left_right + carWidth / 2 < roadWidth / 2 ? left_right + 2. : left_right;
+              left_right = left_right + carWidth / 2 < roadWidth / 2 && activateMove ? left_right + 2. : left_right;
               break;
+
+
+        case Qt::Key_P:
+            StopAnimation();
+            break;
 
         case Qt::Key_Q:
               exit(0);
@@ -220,7 +226,9 @@ void MKWidget::displayCars() {
         /* Get car in array. */
         Car * currentCar = *(oppositeCars + i);
         /* Decrease car's depth. */
-        currentCar->decreaseZ(ground->getRoadSpeed() + 3.5);
+        if (activateMove){
+            currentCar->decreaseZ(ground->getRoadSpeed() + 3.5);
+        }
         float * pos = currentCar->getPosition();
 
         if(pos[2] <  - CAM_POS[2]) generateCar(i);
@@ -344,4 +352,24 @@ void MKWidget::mousePressEvent(QMouseEvent *event)
             update();
         }
     }
+}
+
+
+/**
+ * stop all movement
+ */
+
+void MKWidget::StopAnimation(){
+    if(m_AnimationTimer.isActive())
+    {
+          m_AnimationTimer.stop();
+          activateMove = false;
+
+    }
+    else
+    {
+        m_AnimationTimer.start();
+        activateMove = true;
+    }
+
 }
