@@ -7,6 +7,7 @@
 #include <time.h>
 #include <QDebug>
 
+
 #include "Widget.h"
 
 /**
@@ -58,6 +59,7 @@ void MKWidget::initializeGL()
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
     glEnable(GL_LIGHT1);
+
 
     /* Ambiant light */
     GLfloat light_color_tab[] = { 1.f, 1.f, 1.f, 0.f};
@@ -124,12 +126,16 @@ void MKWidget::paintGL()
     /* Main car */
     car = new Car();
     car->Display(m_TimeElapsed);
-
     glPopMatrix();
 
     /* Display opposite cars and check for collisions. */
     displayCars();
     checkCollison();
+
+    /* Display stop zone */
+    zone = new StopZone();
+    zone->Display();
+
 }
 
 
@@ -159,6 +165,7 @@ void MKWidget::keyPressEvent(QKeyEvent * event)
 
         case Qt::Key_P:
             StopAnimation();
+            // add Pause label
             break;
 
         case Qt::Key_Q:
@@ -373,3 +380,4 @@ void MKWidget::StopAnimation(){
     }
 
 }
+

@@ -9,6 +9,7 @@
 #include "Car.h"
 #include "Barrel.h"
 #include "FuelBar.h"
+#include "stopzone.h"
 
 /**
  * @brief The MyGLWidget class
@@ -42,6 +43,7 @@ private:
     float m_TimeElapsed { 0.0f };
     QTimer m_AnimationTimer;
 
+    StopZone * zone;
     Ground * ground;
     Barrel * barrel;
     FuelBar * fuelBar;
