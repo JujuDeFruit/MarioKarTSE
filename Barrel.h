@@ -35,7 +35,7 @@ public:
 
     /* Methods. */
     void LoadTextures();
-    void Display(uint64_t, Ground *, bool);
+    void Display(Ground *, bool, bool);
     void drawBarrel(GLUquadric *);
     void drawArea();
 

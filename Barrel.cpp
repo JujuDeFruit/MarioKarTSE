@@ -1,4 +1,5 @@
 #include "Barrel.h"
+#include "Widget.h"
 
 
 /**
@@ -53,7 +54,7 @@ void Barrel::LoadTextures() {
  * @param ground : Ground pointer
  * @param barrelPressed : is the barrel pressed by user ?
  */
-void Barrel::Display(uint64_t iTimeElapsed, Ground * ground,  bool barrelPressed) {
+void Barrel::Display( Ground * ground,  bool barrelPressed, bool activateMove) {
 
     if (!created) {
         if (!(std::rand() % 100)) {
@@ -65,7 +66,9 @@ void Barrel::Display(uint64_t iTimeElapsed, Ground * ground,  bool barrelPressed
         }
     }
     if (created) {
-        zPos += speed;
+
+        zPos = activateMove ? zPos += speed : zPos;
+        //zPos += speed;
 
         LoadTextures();
 

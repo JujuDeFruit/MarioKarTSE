@@ -115,7 +115,7 @@ void MKWidget::paintGL()
     DisplayCars();
     CheckCollison();
 
-    barrel->Display(m_TimeElapsed, ground, m_barrelPressed);
+    barrel->Display(ground, m_barrelPressed,activateMove);
     m_barrelPressed = false;
 }
 

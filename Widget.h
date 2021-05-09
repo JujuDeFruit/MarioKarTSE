@@ -82,6 +82,7 @@ private:
     void CheckCollison();
     void PrintTimer();
     void StopAnimation();
+
 };
 
 # endif

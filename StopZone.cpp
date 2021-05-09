@@ -23,43 +23,43 @@ void StopZone::Display()
 
     /*** Bottom ***/
     glColor4f(150, 0, 0, 0.3);
-    glVertex3f(xBegin, y+0.11, z + heigth / 2);
-    glVertex3f(xEnd, y+0.11, z + heigth / 2);
-    glVertex3f(xEnd, y+0.11, z - heigth / 2);
-    glVertex3f(xBegin, y+0.11, z - heigth / 2);
+    glVertex3f(xBegin, y+0.11, z + 2*heigth / 3);
+    glVertex3f(xEnd, y+0.11, z + 2*heigth / 3);
+    glVertex3f(xEnd, y+0.11, z - 2*heigth / 3);
+    glVertex3f(xBegin, y+0.11, z - 2*heigth / 3);
 
     /*** Front ***/
     glColor4f(150, 0, 0, 0.8);
-    glVertex3f(xBegin, y, z - heigth / 2);
-    glVertex3f(xEnd, y, z - heigth / 2);
+    glVertex3f(xBegin, y, z - 2*heigth / 3);
+    glVertex3f(xEnd, y, z - 2*heigth / 3);
     glColor4f(150, 0, 0, 0.1);
-    glVertex3f(xEnd, y + 4.0f, z - heigth / 2);
-    glVertex3f(xBegin, y + 4.0f, z - heigth / 2);
+    glVertex3f(xEnd, y + 4.0f, z - 2*heigth / 3);
+    glVertex3f(xBegin, y + 4.0f, z - 2*heigth / 3);
 
 
     /*** Left ***/
     glColor4f(150, 0, 0, 0.8);
-    glVertex3f(xBegin, y, z - heigth / 2);
-    glVertex3f(xBegin, y, z + heigth / 2);
+    glVertex3f(xBegin, y, z - 2*heigth / 3);
+    glVertex3f(xBegin, y, z + 2*heigth / 3);
     glColor4f(150, 0, 0, 0.1);
-    glVertex3f(xBegin, y + 4.0f, z + heigth / 2);
-    glVertex3f(xBegin, y + 4.0f, z - heigth / 2);
+    glVertex3f(xBegin, y + 4.0f, z + 2*heigth / 3);
+    glVertex3f(xBegin, y + 4.0f, z - 2*heigth / 3);
 
     /*** Right ***/
     glColor4f(150, 0, 0, 0.8);
-    glVertex3f(xEnd, y, z - heigth / 2);
-    glVertex3f(xEnd, y, z + heigth / 2);
+    glVertex3f(xEnd, y, z - 2*heigth / 3);
+    glVertex3f(xEnd, y, z + 2*heigth / 3);
     glColor4f(150, 0, 0, 0.1);
-    glVertex3f(xEnd, y + 4.0f, z + heigth / 2);
-    glVertex3f(xEnd, y + 4.0f, z - heigth / 2);
+    glVertex3f(xEnd, y + 4.0f, z + 2*heigth / 3);
+    glVertex3f(xEnd, y + 4.0f, z - 2*heigth / 3);
 
     /*** Back ***/
     glColor4f(150, 0, 0, 0.8);
-    glVertex3f(xBegin, y, z + heigth / 2);
-    glVertex3f(xEnd, y, z + heigth / 2);
+    glVertex3f(xBegin, y, z + 2*heigth / 3);
+    glVertex3f(xEnd, y, z + 2*heigth / 3);
     glColor4f(150, 0, 0, 0.1);
-    glVertex3f(xEnd, y + 4.0f, z + heigth / 2);
-    glVertex3f(xBegin, y + 4.0f, z + heigth / 2);
+    glVertex3f(xEnd, y + 4.0f, z + 2*heigth / 3);
+    glVertex3f(xBegin, y + 4.0f, z + 2*heigth / 3);
 
     glEnd();
 
