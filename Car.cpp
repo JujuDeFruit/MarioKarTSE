@@ -160,108 +160,11 @@ void Car::Display(uint64_t iTimeElapsed) {
 
     /** Draw Window **/
 
-    glBegin(GL_QUADS);
-
-    /*** Left Front ***/
-    glColor3f(0.f,0.f,0.f);
-    glNormal3f(-1.f,0.f,0.f);
-    glVertex3f(-3.01f,4.8f,-17.7f);
-    glVertex3f(-3.01f,3.0f,-19.7f);
-    glVertex3f(-3.001f,3.0f,-14.f);
-    glVertex3f(-3.001f,4.8f,-14.f);
-
-    /*** Right Front ***/
-    glColor3f(0.f,0.f,0.f);
-    glNormal3f(1.f,0.f,0.f);
-    glVertex3f(3.01f,4.8f,-17.7f);
-    glVertex3f(3.01f,3.0f,-19.7f);
-    glVertex3f(3.01f,3.0f,-14.f);
-    glVertex3f(3.01f,4.8f,-14.f);
-
-    /*** Left Back ***/
-    glColor3f(0.f,0.f,0.f);
-    glNormal3f(-1.f,0.f,0.f);
-    glVertex3f(-3.01f,4.8f,-13.5f);
-    glVertex3f(-3.01f,3.0f,-13.5f);
-    glVertex3f(-3.01f,3.0f,-8.3f);
-    glVertex3f(-3.01f,4.8f,-9.3f);
-
-    /*** Right Back ***/
-    glColor3f(0.f,0.f,0.f);
-    glNormal3f(1.f,0.f,0.f);
-    glVertex3f(3.01f,4.8f,-13.5f);
-    glVertex3f(3.01f,3.0f,-13.5f);
-    glVertex3f(3.01f,3.0f,-8.3f);
-    glVertex3f(3.01f,4.8f,-9.3f);
-
-    /*** Front ***/
-    glColor3ub(0,0,0);
-    glNormal3f(0.f,0.5f,-0.5f);
-    glVertex3f(-2.8f,4.97f,-8.999f);
-    glVertex3f(-2.8f,3.2f,-7.999f);
-    glVertex3f(2.8f,3.2f,-7.999f);
-    glVertex3f(2.8f,4.97f,-8.999f);
-
-    /*** Back ***/
-    glColor3ub(0,0,0);
-    glNormal3f(1.f,0.5f,0.5f);
-    glVertex3f(-2.8f,4.97f,-18.001f);
-    glVertex3f(-2.8f,3.2f,-20.001f);
-    glVertex3f(2.8f,3.2f,-20.001f);
-    glVertex3f(2.8f,4.97f,-18.001f);
-
-    glEnd();
-
+    drawWindows();
 
     /* Headlights */
 
-    glBegin(GL_QUADS);
-
-    /** Headlights settings **/
-    GLfloat colorAmbiante5_tab[] = {1.f, 0.10f, 0.01f, 1.f};
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, colorAmbiante5_tab);
-    GLfloat colorDiffuse5_tab[] = {0.01f, 0.01f, 0.01f, 1.f};
-    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, colorDiffuse5_tab);
-    GLfloat colorSpeculaire5_tab[] = {0.5f, 0.5f, 0.5f, 1.f};
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, colorSpeculaire5_tab);
-    GLfloat shininess5[] = {72};
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, shininess5);
-    GLfloat colorEmission5_tab[] = {0.3, 0.3, 0.3, 1.f};
-    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, colorEmission5_tab);
-
-
-    /*** Front ***/
-    glColor3ub(100,100,50);
-    glNormal3f(0.f,0.f,1.f);
-    glVertex3f(-2.5f,2.f,-4.99f);
-    glVertex3f(-2.5f,1.f,-4.99f);
-    glVertex3f(-1.5f,1.f,-4.99f);
-    glVertex3f(-1.5f,2.f,-4.99f);
-
-    glColor3ub(100,100,50);
-    glNormal3f(0.f,0.f,1.f);
-    glVertex3f(1.5f,2.f,-4.99f);
-    glVertex3f(1.5f,1.f,-4.99f);
-    glVertex3f(2.5f,1.f,-4.99f);
-    glVertex3f(2.5f,2.f,-4.99f);
-
-    /*** Back ***/
-    glColor3ub(100,100,50);
-    glNormal3f(0.f,0.f,-1.f);
-    glVertex3f(-2.5f,2.f,-26.0001f);
-    glVertex3f(-2.5f,1.f,-26.0001f);
-    glVertex3f(-1.5f,1.f,-26.0001f);
-    glVertex3f(-1.5f,2.f,-26.0001f);
-
-    glColor3ub(100,100,50);
-    glNormal3f(0.f,0.f,-1.f);
-    glVertex3f(1.5f,2.f,-26.0001f);
-    glVertex3f(1.5f,1.f,-26.0001f);
-    glVertex3f(2.5f,1.f,-26.0001f);
-    glVertex3f(2.5f,2.f,-26.0001f);
-
-    glEnd();
-
+    drawHeadLights();
 
     /* Tiers */
 
@@ -361,4 +264,131 @@ void Car::drawGirophare(GLUquadric* quadrique, uint64_t iTimeElapsed){
     glColor3f(.25f,.25f,.25f);
     gluSphere(quadrique, 0.5, 10, 10);
     glPopMatrix();
+}
+
+void Car::drawWindows(){
+
+    glDisable(GL_LIGHTING);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    /** Draw Window **/
+
+    glBegin(GL_QUADS);
+
+    /*** Left Front ***/
+    glColor4f(0, 0, 0, 0.8);
+    glNormal3f(-1.f,0.f,0.f);
+    glVertex3f(-3.01f,4.8f,-17.7f);
+    glVertex3f(-3.01f,3.0f,-19.7f);
+    glVertex3f(-3.001f,3.0f,-14.f);
+    glVertex3f(-3.001f,4.8f,-14.f);
+
+    /*** Right Front ***/
+    glColor4f(0, 0, 0, 0.8);
+    glNormal3f(1.f,0.f,0.f);
+    glVertex3f(3.01f,4.8f,-17.7f);
+    glVertex3f(3.01f,3.0f,-19.7f);
+    glVertex3f(3.01f,3.0f,-14.f);
+    glVertex3f(3.01f,4.8f,-14.f);
+
+    /*** Left Back ***/
+    glColor4f(0, 0, 0, 0.8);
+    glNormal3f(-1.f,0.f,0.f);
+    glVertex3f(-3.01f,4.8f,-13.5f);
+    glVertex3f(-3.01f,3.0f,-13.5f);
+    glVertex3f(-3.01f,3.0f,-8.3f);
+    glVertex3f(-3.01f,4.8f,-9.3f);
+
+    /*** Right Back ***/
+    glColor4f(0, 0, 0, 0.8);
+    glNormal3f(1.f,0.f,0.f);
+    glVertex3f(3.01f,4.8f,-13.5f);
+    glVertex3f(3.01f,3.0f,-13.5f);
+    glVertex3f(3.01f,3.0f,-8.3f);
+    glVertex3f(3.01f,4.8f,-9.3f);
+
+    /*** Front ***/
+    glColor4f(0, 0, 0, 0.8);
+    glNormal3f(0.f,0.5f,-0.5f);
+    glVertex3f(-2.8f,4.97f,-8.999f);
+    glVertex3f(-2.8f,3.2f,-7.999f);
+    glVertex3f(2.8f,3.2f,-7.999f);
+    glVertex3f(2.8f,4.97f,-8.999f);
+
+    /*** Back ***/
+    glColor4f(0, 0, 0, 0.8);
+    glNormal3f(1.f,0.5f,0.5f);
+    glVertex3f(-2.8f,4.97f,-18.001f);
+    glVertex3f(-2.8f,3.2f,-20.001f);
+    glVertex3f(2.8f,3.2f,-20.001f);
+    glVertex3f(2.8f,4.97f,-18.001f);
+
+    glEnd();
+
+    glDisable (GL_BLEND);
+    glEnable(GL_LIGHTING);
+}
+
+void Car::drawHeadLights(){
+
+    /** Headlights settings **/
+    GLfloat colorDiffuse5_tab[] = {1.f, 0.01f, 0.01f, 1.f};
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, colorDiffuse5_tab);
+    GLfloat colorSpeculaire5_tab[] = {0.5f, 0.5f, 0.5f, 1.f};
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, colorSpeculaire5_tab);
+    GLfloat shininess5[] = {72};
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, shininess5);
+    GLfloat colorEmission5_tab[] = {0.3, 0.3, 0.3, 1.f};
+    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, colorEmission5_tab);
+
+    glBegin(GL_QUADS);
+
+    /*** Front ***/
+    glColor3ub(255,255,50);
+    glNormal3f(0.f,0.f,1.f);
+    glVertex3f(-2.5f,2.f,-4.99f);
+    glVertex3f(-2.5f,1.f,-4.99f);
+    glVertex3f(-1.5f,1.f,-4.99f);
+    glVertex3f(-1.5f,2.f,-4.99f);
+
+    glColor3ub(255,255,50);
+    glNormal3f(0.f,0.f,1.f);
+    glVertex3f(1.5f,2.f,-4.99f);
+    glVertex3f(1.5f,1.f,-4.99f);
+    glVertex3f(2.5f,1.f,-4.99f);
+    glVertex3f(2.5f,2.f,-4.99f);
+
+    glEnd();
+
+    /** Headlights settings **/
+    GLfloat colorDiffuse9_tab[] = {1.f, 1.f, 0.01f, 1.f};
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, colorDiffuse9_tab);
+    GLfloat colorSpeculaire9_tab[] = {0.5f, 0.5f, 0.5f, 1.f};
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, colorSpeculaire9_tab);
+    GLfloat shininess9[] = {72};
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, shininess9);
+    GLfloat colorEmission9_tab[] = {0.3, 0.3, 0.3, 1.f};
+    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, colorEmission9_tab);
+
+    glBegin(GL_QUADS);
+    /*** Back ***/
+    glColor3ub(100,100,50);
+    glNormal3f(0.f,0.f,-1.f);
+    glVertex3f(-2.5f,2.f,-26.1f);
+    glVertex3f(-2.5f,1.f,-26.1f);
+    glVertex3f(-1.5f,1.f,-26.1f);
+    glVertex3f(-1.5f,2.f,-26.1f);
+
+    glColor3ub(100,100,50);
+    glNormal3f(0.f,0.f,-1.f);
+    glVertex3f(1.5f,2.f,-26.1f);
+    glVertex3f(1.5f,1.f,-26.1f);
+    glVertex3f(2.5f,1.f,-26.1f);
+    glVertex3f(2.5f,2.f,-26.1f);
+
+    glEnd();
+
+
+
 }

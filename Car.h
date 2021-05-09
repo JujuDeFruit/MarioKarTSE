@@ -26,6 +26,8 @@ public:
     static void drawTier(GLUquadric*);
     static void drawGirophare(GLUquadric*, uint64_t);
     void decreaseZ(float decrement) { position[2] = position[2] - decrement; }; // Approach car.
+    void drawWindows();
+    void drawHeadLights();
 
     /* Getters */
     float GetWidth() const { return 6.; }
