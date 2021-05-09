@@ -27,6 +27,7 @@
  * @param NB_OPPOSITE_CARS : numbers of opposite cars to generate.
  * @param CAM_POS : position {x, y, z} of the camera.
  * @param left_right : translation of main car.
+ * @param degree : rotation of main car.
  * @param m_TimeElapsed
  * @param m_AnimationTimer : timer to synchronize on.
  * @param ground : ground pointer.
@@ -47,6 +48,7 @@ private:
     float * CAM_POS = new float[3]{0.,25., 60.};
 
     double left_right = 0.;
+    double degree = 0.;
 
     float m_TimeElapsed { 0.0f };
     QTimer m_AnimationTimer;
@@ -73,6 +75,7 @@ private:
     virtual void resizeGL(int, int);
     virtual void paintGL();
     virtual void keyPressEvent(QKeyEvent* event);
+    virtual void keyReleaseEvent(QKeyEvent* event);
     virtual void mousePressEvent(QMouseEvent* event);
 
     /* Methods */

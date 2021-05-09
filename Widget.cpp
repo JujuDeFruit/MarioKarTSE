@@ -136,13 +136,15 @@ void MKWidget::keyPressEvent(QKeyEvent * event)
         /* Move car to left side, and make sure car does not get out of the road. */
         case Qt::Key_Left:
               left_right = left_right - carWidth / 2 > - roadWidth / 2 && activateMove ? left_right - 2. : left_right;
+              degree = 3;
               break;
 
         /* Move car to right side, and make sure car does not get out of the road. */
         case Qt::Key_Right:
               left_right = left_right + carWidth / 2 < roadWidth / 2 && activateMove ? left_right + 2. : left_right;
+              degree = -3;
+              qDebug() << degree;
               break;
-
 
         case Qt::Key_P:
             StopAnimation();
@@ -154,7 +156,7 @@ void MKWidget::keyPressEvent(QKeyEvent * event)
 
         /* Default case. */
         default:
-        {
+        { 
             /* Ignore event. */
             event->ignore();
             return;
@@ -164,6 +166,21 @@ void MKWidget::keyPressEvent(QKeyEvent * event)
     /* Accept event and update scene */
     event->accept();
     update();
+}
+
+/**
+ * Keyboard interaction method
+ *
+ * @param event : key release event
+ */
+
+void MKWidget::keyReleaseEvent(QKeyEvent *event)
+{
+    if (!event->isAutoRepeat())
+    {
+        degree = 0;
+    }
+
 }
 
 
@@ -232,10 +249,10 @@ void MKWidget::DisplayMainCar() {
     glPushMatrix();
     /* Print main car */
     glTranslated(left_right ,1., 0.);
+    glRotated(degree, 0 ,1., 0.);
 
-    /* Main car */
+    /* Main car */;
     car->Display(m_TimeElapsed);
-
     glPopMatrix();
 }
 

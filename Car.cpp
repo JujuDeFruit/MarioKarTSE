@@ -19,7 +19,6 @@ Car::Car(GLfloat * color_){
  * @param iTimeElapsed : timer to synchronize displaying.
  */
 void Car::Display(uint64_t iTimeElapsed) {
-
     glPushMatrix();
 
     /* Car settings */
