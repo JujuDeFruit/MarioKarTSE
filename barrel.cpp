@@ -1,15 +1,39 @@
 #include "Barrel.h"
 
+
 /**
  * Constructor of Barrel
  */
 Barrel::Barrel(){
 
-    /* Textures */
-    QImage s_fuel=QGLWidget::convertToGLFormat(QImage(":/fuel.jpg"));
+    /* Is barrel already created ? */
+    created = false;
 
     /* Generate an array of textures */
     glGenTextures(1, textureID);
+
+    xPos = 0;
+    zPos = -200;
+    speed = 2;
+
+}
+
+
+/**
+ * Delete textures
+ */
+Barrel::~Barrel(){
+    delete [] textureID;
+}
+
+
+/**
+ * @brief Barrel::LoadTextures
+ * Load all textures in array of textures.
+ */
+void Barrel::LoadTextures() {
+    /* Textures */
+    QImage s_fuel = QGLWidget::convertToGLFormat(QImage(":/fuel.jpg"));
 
     /* Load barrel textures */
     glBindTexture(GL_TEXTURE_2D, textureID[0]);
@@ -18,15 +42,8 @@ Barrel::Barrel(){
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T, GL_REPEAT);
-
 }
 
-/**
- * Delete textures
- */
-Barrel::~Barrel(){
-    delete [] textureID;
-}
 
 /**
  * Display Barrels
@@ -37,53 +54,60 @@ Barrel::~Barrel(){
  */
 void Barrel::Display(uint64_t iTimeElapsed, Ground * ground,  bool barrelPressed) {
 
-     glDisable(GL_LIGHTING);
-     glEnable(GL_TEXTURE_2D);
+    if (!created) {
+        if (!(std::rand() % 100)) {
+            /* Initialize barrel position. */
+            xPos = (std::rand() % 2) ? ground->GetRoadWidth()/2 + 1 : - ground->GetRoadWidth()/2 - 1;
+            zPos = zInitBarrel;
+            /* Barrel is created */
+            created = true;
+        }
+    }
+    if (created) {
+        zPos += speed;
 
-     /* Barrel quadric */
-     GLUquadric* quadrique = gluNewQuadric();
-     gluQuadricDrawStyle(quadrique, GLU_FILL);
+        LoadTextures();
 
-     /* Bind textures to array of textures */
-     glBindTexture(GL_TEXTURE_2D, textureID[0]);
+        glDisable(GL_LIGHTING);
+        glEnable(GL_TEXTURE_2D);
 
-     /* Change barrels color upon click */
-     if (barrelPressed || prevClicked_) {
-         glColor3f(100.f, 0.f, 0.f);
-         prevClicked_ = true;
-     } else {
-         glColor3f(100.f, 100.f, 100.f);
-     }
+        /* Barrel quadric */
+        GLUquadric* quadrique = gluNewQuadric();
+        gluQuadricDrawStyle(quadrique, GLU_FILL);
 
-     if (iTimeElapsed % 260 == 0 ) {
-         glColor3f(100.f, 100.f, 100.f);
-         prevClicked_ = false;
-     }
+        /* Bind textures to array of textures */
+        glBindTexture(GL_TEXTURE_2D, textureID[0]);
 
+        /* Change barrels color upon click */
+        if (barrelPressed || prevClicked_) {
+            glColor3f(100.f, 0.f, 0.f);
+            prevClicked_ = true;
+        } else {
+            glColor3f(100.f, 100.f, 100.f);
+        }
 
+        /* Draw Barrel */
+        glPushMatrix();
+        glTranslated(xPos, 5.f, zPos); // Translation
+        drawBarrel(quadrique);
+        glPopMatrix();
 
-     /* Draw Barrels */
-     glPushMatrix();
-     glTranslated(- ground->getRoadWidth()/2 - 1., 5.f, -200. + (iTimeElapsed % 260)); // Translation
-     drawBarrel(quadrique);
-     glPopMatrix();
+        drawArea();
 
-     glPushMatrix();
-     glTranslated(ground->getRoadWidth()/2 + 1., 5.f, -250. + (iTimeElapsed % 310)); // Translation
-     drawBarrel(quadrique);
-     glPopMatrix();
+        gluDeleteQuadric(quadrique);     // Remove barrel when out of frame
 
-     glPushMatrix();
-     glTranslated(ground->getRoadWidth()/2 + 1., 5.f, -330. + (iTimeElapsed % 390)); // Translation
-     drawBarrel(quadrique);
-     glPopMatrix();
+        glDisable(GL_TEXTURE_2D);
+        glEnable(GL_LIGHTING);
 
-     gluDeleteQuadric(quadrique);     // Remove barrel when out of frame
-
-     glDisable(GL_TEXTURE_2D);
-     glEnable(GL_LIGHTING);
-
+        if (zPos >= 60) {
+            created = false;
+            zPos = zInitBarrel;
+            glColor3f(100.f, 100.f, 100.f);
+            prevClicked_ = false;
+        }
+    }
 }
+
 
 /**
  * Draw barrel to define it on ground
@@ -105,4 +129,25 @@ void Barrel::drawBarrel(GLUquadric * quadrique){
     gluDisk(quadrique,0.25,1.5,12,1);
 
    // glPopMatrix();
+}
+
+
+/**
+ * @brief drawArea
+ * Draw green area to stop car and fill the car.
+ * @param xPos : x position of the barrel.
+ */
+void Barrel::drawArea() {
+
+    int xBegin = xPos > 0 ? xPos - 1 : xPos + 1;
+    int xEnd = xPos > 0 ? xPos - 1 - areaSide : xPos + 1 + areaSide;
+
+    glPushMatrix();
+    glBegin(GL_QUADS);
+    glVertex3f(xBegin, 1., zPos - areaSide / 2);
+    glVertex3f(xEnd, 1., zPos - areaSide / 2);
+    glVertex3f(xEnd, 1., zPos + areaSide / 2);
+    glVertex3f(xBegin, 1., zPos + areaSide / 2);
+    glEnd();
+    glPopMatrix();
 }

@@ -5,6 +5,14 @@
 #include <GL/glu.h>
 #include <QKeyEvent>
 #include <QTimer>
+#include <QApplication>
+#include <QDesktopWidget>
+#include <GL/glu.h>
+#include <stdlib.h>
+#include <windows.h>
+#include <stdlib.h>
+#include <time.h>
+#include <QDebug>
 
 #include "Car.h"
 #include "Barrel.h"
@@ -68,9 +76,10 @@ private:
     virtual void mousePressEvent(QMouseEvent* event);
 
     /* Methods */
-    void generateCar(unsigned int, bool = false);
-    void displayCars();
-    void checkCollison();
+    void DisplayMainCar();
+    void GenerateCar(unsigned int, bool = false);
+    void DisplayCars();
+    void CheckCollison();
     void PrintTimer();
     void StopAnimation();
 };

@@ -363,10 +363,3 @@ void Car::drawGirophare(GLUquadric* quadrique, uint64_t iTimeElapsed){
     gluSphere(quadrique, 0.5, 10, 10);
     glPopMatrix();
 }
-
-/**
- * Move opposite car to approach screen
- *
- * @param decrement : value to decrease z component of the car.
- */
-void Car::decreaseZ(float decrement) { position[2] = position[2] - decrement; }

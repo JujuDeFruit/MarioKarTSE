@@ -25,12 +25,12 @@ public:
     void Display(uint64_t);
     static void drawTier(GLUquadric*);
     static void drawGirophare(GLUquadric*, uint64_t);
-    void decreaseZ(float);
+    void decreaseZ(float decrement) { position[2] = position[2] - decrement; }; // Approach car.
 
     /* Getters */
-    float getWidth() const { return 6.; }
-    float getHeight() const { return 19.; }
-    float * getPosition() { return position; }
+    float GetWidth() const { return 6.; }
+    float GetHeight() const { return 19.; }
+    float * GetPosition() { return position; }
 
     /* Setters */
     void setPosition(float * pos) { position = pos; }

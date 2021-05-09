@@ -4,6 +4,7 @@
 #include <qopengl.h>
 #include <GL/glu.h>
 #include <QGLWidget>
+#include <time.h>
 
 #include "Ground.h"
 
@@ -16,13 +17,30 @@
 class Barrel
 {
 private:
+    const int zInitBarrel = -200;
+    const int areaSide = 20;
+
     GLuint* textureID = new GLuint[1];
     bool prevClicked_ = false;
+    int xPos, zPos;
+    int speed;
+    bool created;
 
 public:
+    /* Constructor. */
     Barrel();
+
+    /* Methods. */
+    void LoadTextures();
     void Display(uint64_t, Ground *, bool);
-    static void drawBarrel(GLUquadric *);
+    void drawBarrel(GLUquadric *);
+    void drawArea();
+
+    /* Getter. */
+    int GetXPos() const { return xPos; }
+    int GetZPos() const { return zPos; }
+
+    /* Destructor. */
     ~Barrel();
 };
 

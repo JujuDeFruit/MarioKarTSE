@@ -4,21 +4,35 @@
 /**
  * @brief Ground::Ground
  * Constructor of ground.
- * @param iTimeElapsed : timer to synchronize on.
  */
-Ground::Ground(uint64_t iTimeElapsed){
+Ground::Ground(){
+    roadSpeed = 0.;
+    grassSpeed = 0.;
+}
 
-    /* Define speeds */
-    roadSpeed = (iTimeElapsed % 10) / 10.;
-    grassSpeed = (iTimeElapsed % 15) / 15.;
+
+/**
+ * @brief Ground::~Ground
+ * Destructor of ground.
+ */
+Ground::~Ground(){
+    delete [] textureID;
+}
+
+
+/**
+ * @brief Ground::LoadTextures
+ * Load all ground textures.
+ */
+void Ground::LoadTextures(){
+
+    /* Generate array of textures */
+    glGenTextures(3, textureID);
 
     /* Load textures */
     QImage grass = QGLWidget::convertToGLFormat(QImage(":/grass.jpg"));
     QImage sky = QGLWidget::convertToGLFormat(QImage(":/sky.jpg"));
     QImage road = QGLWidget::convertToGLFormat(QImage(":/road.jpg"));
-
-    /* Generate array of textures */
-    glGenTextures(3, textureID);
 
     /* Sky texture */
     glBindTexture(GL_TEXTURE_2D, textureID[0]);
@@ -47,19 +61,18 @@ Ground::Ground(uint64_t iTimeElapsed){
 
 
 /**
- * @brief Ground::~Ground
- * Destructor of ground.
- */
-Ground::~Ground(){
-    delete [] textureID;
-}
-
-
-/**
  * @brief Ground::Display
  * Display and refresh ground.
+ * @param m_TimeElapsed : timer to synchronize on.
  */
-void Ground::Display(){
+void Ground::Display(uint64_t m_TimeElapsed){
+
+    /* Define speeds */
+    roadSpeed = (m_TimeElapsed % 10) / 10.;
+    grassSpeed = (m_TimeElapsed % 15) / 15.;
+
+    /* Load all textures. */
+    LoadTextures();
 
     glEnable(GL_TEXTURE_2D);
     /* Bind sky texture to array */
@@ -67,7 +80,6 @@ void Ground::Display(){
 
     /* Draw sky */
     glBegin(GL_QUADS);
-    //glColor3ub(200,200,200);
     glTexCoord2f(0,2);glVertex3f(-200.0f,200.0f,-200.f);
     glTexCoord2f(0,0);glVertex3f(-200.0f,0.0f,-200.f);
     glTexCoord2f(2,0);glVertex3f(200.0f,0.0f,-200.f);
@@ -83,7 +95,6 @@ void Ground::Display(){
 
     /* Draw the grass */
     glBegin(GL_QUADS);
-    //glColor3ub(0,100,0);
     glTexCoord2f(0,5 + grassSpeed);glVertex3f(-200.0f,0.0f,-200.f);
     glTexCoord2f(0,0 + grassSpeed);glVertex3f(-200.0f,0.0f,60.f);
     glTexCoord2f(5,0 + grassSpeed);glVertex3f(200.0f,0.0f,60.f);
@@ -99,7 +110,6 @@ void Ground::Display(){
 
     /* Draw the ground */
     glBegin(GL_QUADS);
-    //glColor3ub(100,100,100);
     glTexCoord2f(0,0 + roadSpeed);glVertex3f(25.0f,0.1f,60.f);
     glTexCoord2f(1,0 + roadSpeed);glVertex3f(-25.0f,0.1f,60.f);
     glTexCoord2f(1,10 + roadSpeed);glVertex3f(-25.0f,0.1f,-200.f);

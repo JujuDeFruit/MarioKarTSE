@@ -1,13 +1,3 @@
-#include <QApplication>
-#include <QDesktopWidget>
-#include <GL/glu.h>
-#include <stdlib.h>
-#include <windows.h>
-#include <stdlib.h>
-#include <time.h>
-#include <QDebug>
-
-
 #include "Widget.h"
 
 /**
@@ -34,10 +24,19 @@ MKWidget::MKWidget(QOpenGLWidget * parent):QOpenGLWidget(parent)
     std::srand(time(0));
 
     /* Generate cars and fill array of opposite cars */
-    for(unsigned int i = 0; i < NB_OPPOSITE_CARS; i++) generateCar(i, true);
+    for(unsigned int i = 0; i < NB_OPPOSITE_CARS; i++) GenerateCar(i, true);
 
-    /* Generate fuel bar */
+    /* Create ground. */
+    ground = new Ground();
+
+    /* Create main car. */
+    car = new Car();
+
+    /* Create fuel bar */
     fuelBar = new FuelBar(CAM_POS);
+
+    /* Create barrel */
+    barrel = new Barrel();
 
     /* Create and set timer */
     m_AnimationTimer.setInterval(15);
@@ -102,40 +101,26 @@ void MKWidget::paintGL()
     // Set camera
              //camX camY camZ targetX targetY targetZ vecX vecY vecZ.
     gluLookAt(CAM_POS[0], CAM_POS[1], CAM_POS[2],0.,0.,0.,0.,1.,0.);
-    //gluLookAt(0.,150., 0,0.,0.,0.,0.,0.,1.);
+    //gluLookAt(0., 150., 0.,0.,0.,0.,0.,1.,0.);
 
     /* Display ground. */
-    ground = new Ground(m_TimeElapsed);
-    ground->Display();
+    ground->Display(m_TimeElapsed);
 
-    /* Display barrel */
-    barrel = new Barrel();
-    barrel->Display(m_TimeElapsed, ground,m_barrelPressed);
+    barrel->Display(m_TimeElapsed, ground, m_barrelPressed);
     m_barrelPressed = false;
 
-    /* Decrease fuel bar */
-    fuelBar->Decrease(.2);
+    /* Display fuel bar */
     fuelBar->Display();
-    /* Exit if fuel bar is empty */
-    if (fuelBar->GetValue() == 0.0) exit(0);
-
-    glPushMatrix();
-    /* Print main car */
-    glTranslated(left_right ,1., 0.);
-
-    /* Main car */
-    car = new Car();
-    car->Display(m_TimeElapsed);
-    glPopMatrix();
-
-    /* Display opposite cars and check for collisions. */
-    displayCars();
-    checkCollison();
 
     /* Display stop zone */
     zone = new StopZone();
     zone->Display();
 
+    DisplayMainCar();
+
+    /* Display opposite cars and check for collisions. */
+    DisplayCars();
+    CheckCollison();
 }
 
 
@@ -146,8 +131,8 @@ void MKWidget::paintGL()
  */
 void MKWidget::keyPressEvent(QKeyEvent * event)
 {
-    const float roadWidth = ground->getRoadWidth();
-    const float carWidth = car->getWidth();
+    const float roadWidth = ground->GetRoadWidth();
+    const float carWidth = car->GetWidth();
 
 
     switch(event->key())
@@ -187,114 +172,6 @@ void MKWidget::keyPressEvent(QKeyEvent * event)
 
 
 /**
- * Generate car coming from opposite side.
- *
- * @param i : index of array to generate car
- * @param init : boolean to set initialisation of the game or not
- */
-void MKWidget::generateCar(unsigned int i, bool init) {
-
-        GLfloat * color = new GLfloat[3] { 1., 0., 0. };
-
-        /* Get random percent of the road (0% left side of the road; 10% right side of the road). */
-        float percentOfXRoad = (std::rand() % 100 + 1) / 100.;
-
-        GLfloat * scopeRoad = new GLfloat[2] { (car->getWidth() - ground->getRoadWidth())/2, (ground->getRoadWidth() - car->getWidth())/2};
-
-        /* Set the opposite car position. */
-        float * pos = new float[3];
-        pos[0] = scopeRoad[0] + percentOfXRoad * (scopeRoad[1] - scopeRoad[0]);
-        pos[1] = 1.;
-        distBetOppCars = (ground->getRoadHeight() + CAM_POS[2]) * (i + 1 + NB_OPPOSITE_CARS)/NB_OPPOSITE_CARS;
-        /* If initialisation of game, generate other car further */
-        pos[2] = !init ? ground->getRoadHeight() : distBetOppCars;
-
-        /* Create opposite car and set position. */
-        Car * oppositeCar = new Car(color);
-        oppositeCar->setPosition(pos);
-
-        /* Fill array. */
-        *(oppositeCars + i) = oppositeCar;
-}
-
-
-/**
- * Display opposite cars stored in oppositeCars array.
- */
-void MKWidget::displayCars() {
-
-    /* For all cars stored in array. */
-    for(unsigned int i = 0; i < NB_OPPOSITE_CARS; i++) {
-        /* Save main matrix. */
-        glPushMatrix();
-        /* Rotate car. */
-        glRotatef(180, 0, 1, 0);
-
-        /* Get car in array. */
-        Car * currentCar = *(oppositeCars + i);
-        /* Decrease car's depth. */
-        if (activateMove){
-            currentCar->decreaseZ(ground->getRoadSpeed() + 3.5);
-        }
-        float * pos = currentCar->getPosition();
-
-        if(pos[2] <  - CAM_POS[2]) generateCar(i);
-
-        /* Translate position matrix. */
-        glTranslated(pos[0], pos[1], pos[2]);
-        /* Resfresh car printing. */
-        currentCar->Display(m_TimeElapsed);
-
-        /* Load main matrix. */
-        glPopMatrix();
-    }
-}
-
-
-/**
- * Check if there is colision cars.
- */
-void MKWidget::checkCollison() {
-    /* Get main car current position */
-    float xCarPos = -left_right; // Invert pos to compare to opposite
-    float zCarPos = -18.;
-
-    /* Check for all opposite cars. */
-    for (unsigned int i = 0; i < NB_OPPOSITE_CARS; i++) {
-
-        float * oppPos = oppositeCars[i]->getPosition();
-
-        /* Check for collisions with main car. */
-        if (
-                (-oppPos[2] - oppositeCars[i]->getHeight() >= zCarPos - car->getHeight()/2
-                 && -oppPos[2] - oppositeCars[i]->getHeight() <= zCarPos + car->getHeight()/2.
-                 ||-oppPos[2] + oppositeCars[i]->getHeight() >= zCarPos - car->getHeight()/2
-                 && -oppPos[2] + oppositeCars[i]->getHeight() <= zCarPos + car->getHeight()/2)
-                && (oppPos[0] <= xCarPos
-                 && oppPos[0] + oppositeCars[i]->getWidth() > xCarPos
-                 || oppPos[0] < xCarPos + car->getWidth()
-                 && oppPos[0] + oppositeCars[i]->getWidth() >= xCarPos + car->getWidth())
-            ) {
-                exit(0);
-        }
-    }
-}
-
-/**
- * @brief MKWidget::PrintTimer
- * Print timer on screen.
- */
-void MKWidget::PrintTimer()
-{
-  /*glColor3f(1., 1., 1.);
-  glRasterPos2f(0, 0);
-  char * timer, font;
-  for (int i = 0; i < (int)strlen(timer); i++) {
-    glutBitmapCharacter(font, timer[i]);
-  }*/
-}
-
-/**
  * @brief MKWidget::mousePressEvent
  * Override mousPressEvent method.
  * @param event : mouse press event.
@@ -332,17 +209,7 @@ void MKWidget::mousePressEvent(QMouseEvent *event)
         gluQuadricDrawStyle(quadrique, GLU_FILL);
 
         glPushMatrix();
-        glTranslated(- ground->getRoadWidth()/2 - 1., 5.f, -200. + ((uint64_t)m_TimeElapsed % 260));
-        barrel->drawBarrel(quadrique);
-        glPopMatrix();
-
-        glPushMatrix();
-        glTranslated(ground->getRoadWidth()/2 + 1., 5.f, -250. + ((uint64_t)m_TimeElapsed % 310));
-        barrel->drawBarrel(quadrique);
-        glPopMatrix();
-
-        glPushMatrix();
-        glTranslated(ground->getRoadWidth()/2 + 1., 5.f, -330. + ((uint64_t)m_TimeElapsed % 390));
+        glTranslated(barrel->GetXPos(), 5.f, barrel->GetZPos());
         barrel->drawBarrel(quadrique);
         glPopMatrix();
 
@@ -351,7 +218,6 @@ void MKWidget::mousePressEvent(QMouseEvent *event)
         glFlush();
 
         hits = glRenderMode(GL_RENDER);
-        //qDebug()<<hits;
         if (hits == 1){
             m_barrelPressed = true;
             fuelBar->Fill();
@@ -363,9 +229,134 @@ void MKWidget::mousePressEvent(QMouseEvent *event)
 
 
 /**
- * stop all movement
+ * @brief DisplayMainCar
+ * Display main car on screen.
  */
+void MKWidget::DisplayMainCar() {
+    glPushMatrix();
+    /* Print main car */
+    glTranslated(left_right ,1., 0.);
 
+    /* Main car */
+    car->Display(m_TimeElapsed);
+
+    glPopMatrix();
+}
+
+
+/**
+ * Generate car coming from opposite side.
+ *
+ * @param i : index of array to generate car
+ * @param init : boolean to set initialisation of the game or not
+ */
+void MKWidget::GenerateCar(unsigned int i, bool init) {
+
+        GLfloat * color = new GLfloat[3] { 1., 0., 0. };
+
+        /* Get random percent of the road (0% left side of the road; 10% right side of the road). */
+        float percentOfXRoad = (std::rand() % 100 + 1) / 100.;
+
+        GLfloat * scopeRoad = new GLfloat[2] { (car->GetWidth() - ground->GetRoadWidth())/2, (ground->GetRoadWidth() - car->GetWidth())/2};
+
+        /* Set the opposite car position. */
+        float * pos = new float[3];
+        pos[0] = scopeRoad[0] + percentOfXRoad * (scopeRoad[1] - scopeRoad[0]);
+        pos[1] = 1.;
+        distBetOppCars = (ground->GetRoadHeight() + CAM_POS[2]) * (i + 1 + NB_OPPOSITE_CARS)/NB_OPPOSITE_CARS;
+        /* If initialisation of game, generate other car further */
+        pos[2] = !init ? ground->GetRoadHeight() : distBetOppCars;
+
+        /* Create opposite car and set position. */
+        Car * oppositeCar = new Car(color);
+        oppositeCar->setPosition(pos);
+
+        /* Fill array. */
+        *(oppositeCars + i) = oppositeCar;
+}
+
+
+/**
+ * Display opposite cars stored in oppositeCars array.
+ */
+void MKWidget::DisplayCars() {
+
+    /* For all cars stored in array. */
+    for(unsigned int i = 0; i < NB_OPPOSITE_CARS; i++) {
+        /* Save main matrix. */
+        glPushMatrix();
+        /* Rotate car. */
+        glRotatef(180, 0, 1, 0);
+
+        /* Get car in array. */
+        Car * currentCar = *(oppositeCars + i);
+
+        /* Decrease car's depth. */
+            currentCar->decreaseZ(ground->GetRoadSpeed() + 3.5);
+
+        float * pos = currentCar->GetPosition();
+
+        if(pos[2] <  - CAM_POS[2]) GenerateCar(i);
+
+        /* Translate position matrix. */
+        glTranslated(pos[0], pos[1], pos[2]);
+        /* Resfresh car printing. */
+        currentCar->Display(m_TimeElapsed);
+
+        /* Load main matrix. */
+        glPopMatrix();
+    }
+}
+
+
+/**
+ * Check if there is colision cars.
+ */
+void MKWidget::CheckCollison() {
+    /* Get main car current position */
+    float xCarPos = -left_right; // Invert pos to compare to opposite
+    float zCarPos = -18.;
+
+    /* Check for all opposite cars. */
+    for (unsigned int i = 0; i < NB_OPPOSITE_CARS; i++) {
+
+        float * oppPos = oppositeCars[i]->GetPosition();
+
+        /* Check for collisions with main car. */
+        if (
+                (-oppPos[2] - oppositeCars[i]->GetHeight() >= zCarPos - car->GetHeight()/2
+                 && -oppPos[2] - oppositeCars[i]->GetHeight() <= zCarPos + car->GetHeight()/2.
+                 ||-oppPos[2] + oppositeCars[i]->GetHeight() >= zCarPos - car->GetHeight()/2
+                 && -oppPos[2] + oppositeCars[i]->GetHeight() <= zCarPos + car->GetHeight()/2)
+                && (oppPos[0] <= xCarPos
+                 && oppPos[0] + oppositeCars[i]->GetWidth() > xCarPos
+                 || oppPos[0] < xCarPos + car->GetWidth()
+                 && oppPos[0] + oppositeCars[i]->GetWidth() >= xCarPos + car->GetWidth())
+            ) {
+                exit(0);
+        }
+    }
+}
+
+
+/**
+ * @brief MKWidget::PrintTimer
+ * Print timer on screen.
+ */
+void MKWidget::PrintTimer()
+{
+  /*glColor3f(1., 1., 1.);
+  glRasterPos2f(0, 0);
+  char * timer, font;
+  for (int i = 0; i < (int)strlen(timer); i++) {
+    glutBitmapCharacter(font, timer[i]);
+  }*/
+}
+
+
+/**
+ * Stop all movement in the scene.
+ */
 void MKWidget::StopAnimation(){
     if(m_AnimationTimer.isActive())
     {
@@ -380,4 +371,3 @@ void MKWidget::StopAnimation(){
     }
 
 }
-
