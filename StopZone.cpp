@@ -7,8 +7,8 @@
  */
 void StopZone::Display()
 {
-    float xBegin = position[0] > 0 ? position[0] - 1 : position[0] + 1;
-    float xEnd = position[0] > 0 ? position[0] - 1 - width : position[0] + 1 + width;
+    float xBegin = position[0] > 0 ? position[0] - 3 : position[0] + 3;
+    float xEnd = position[0] > 0 ? position[0] - 1 - 2*width/3 : position[0] + 1 + 2*width/3;
     float y = 0.;
     float z = position[2];
 
@@ -23,10 +23,10 @@ void StopZone::Display()
 
     /*** Bottom ***/
     glColor4f(150, 0, 0, 0.3);
-    glVertex3f(xBegin, y, z + heigth / 2);
-    glVertex3f(xEnd, y, z + heigth / 2);
-    glVertex3f(xEnd, y, z - heigth / 2);
-    glVertex3f(xBegin, y, z - heigth / 2);
+    glVertex3f(xBegin, y+0.11, z + heigth / 2);
+    glVertex3f(xEnd, y+0.11, z + heigth / 2);
+    glVertex3f(xEnd, y+0.11, z - heigth / 2);
+    glVertex3f(xBegin, y+0.11, z - heigth / 2);
 
     /*** Front ***/
     glColor4f(150, 0, 0, 0.8);

@@ -106,9 +106,6 @@ void MKWidget::paintGL()
     /* Display ground. */
     ground->Display(m_TimeElapsed);
 
-    barrel->Display(m_TimeElapsed, ground, m_barrelPressed);
-    m_barrelPressed = false;
-
     /* Display fuel bar */
     fuelBar->Display();
 
@@ -117,6 +114,9 @@ void MKWidget::paintGL()
     /* Display opposite cars and check for collisions. */
     DisplayCars();
     CheckCollison();
+
+    barrel->Display(m_TimeElapsed, ground, m_barrelPressed);
+    m_barrelPressed = false;
 }
 
 
@@ -288,8 +288,9 @@ void MKWidget::DisplayCars() {
         Car * currentCar = *(oppositeCars + i);
 
         /* Decrease car's depth. */
+        if(activateMove){
             currentCar->decreaseZ(ground->GetRoadSpeed() + 3.5);
-
+        }
         float * pos = currentCar->GetPosition();
 
         if(pos[2] <  - CAM_POS[2]) GenerateCar(i);
