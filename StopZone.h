@@ -9,16 +9,28 @@
  * Display stop zones for the cas on the screen.
  *
  */
-
 class StopZone
 {
-public:
-    /* Constructor */
-    StopZone();
-    ~StopZone();
+private:
+    /* Dimensions of area. */
+    const float width = 25.;
+    const float heigth = 10.;
 
-    /* Methods */
+    /* Current position of the barrel. */
+    float * position;
+
+public:
+    /* Constructor. */
+    StopZone() { position = new float[3]; }
+
+    /* Methods. */
     void Display();
+
+    /* Setter. */
+    void setPosition(float * newPosition) { position = newPosition; }
+
+    /* Getter. */
+    float * GetPosition() const { return position; }
 };
 
 #endif // STOPZONE_H

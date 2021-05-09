@@ -16,6 +16,7 @@ Barrel::Barrel(){
     zPos = -200;
     speed = 2;
 
+    stopZone = new StopZone();
 }
 
 
@@ -92,7 +93,9 @@ void Barrel::Display(uint64_t iTimeElapsed, Ground * ground,  bool barrelPressed
         drawBarrel(quadrique);
         glPopMatrix();
 
-        drawArea();
+        float * position = new float[3] { xPos, 5.0f, zPos};
+        stopZone->setPosition(position);
+        stopZone->Display();
 
         gluDeleteQuadric(quadrique);     // Remove barrel when out of frame
 
@@ -133,8 +136,8 @@ void Barrel::drawBarrel(GLUquadric * quadrique){
 
 
 /**
- * @brief drawArea
- * Draw green area to stop car and fill the car.
+ * @brief drawStopZone
+ * Draw area to stop car and fill the car.
  * @param xPos : x position of the barrel.
  */
 void Barrel::drawArea() {

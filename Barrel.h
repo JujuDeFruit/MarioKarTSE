@@ -7,6 +7,7 @@
 #include <time.h>
 
 #include "Ground.h"
+#include "StopZone.h"
 
 /**
  * Manage fuel barrels displayed along the road.
@@ -22,9 +23,11 @@ private:
 
     GLuint* textureID = new GLuint[1];
     bool prevClicked_ = false;
-    int xPos, zPos;
+    float xPos, zPos;
     int speed;
     bool created;
+
+    StopZone * stopZone;
 
 public:
     /* Constructor. */

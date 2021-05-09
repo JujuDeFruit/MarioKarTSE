@@ -112,10 +112,6 @@ void MKWidget::paintGL()
     /* Display fuel bar */
     fuelBar->Display();
 
-    /* Display stop zone */
-    zone = new StopZone();
-    zone->Display();
-
     DisplayMainCar();
 
     /* Display opposite cars and check for collisions. */

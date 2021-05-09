@@ -2,74 +2,68 @@
 
 
 /**
- * @brief StopZone::StopZone
- * Constructor of StopZone object.
- *
+ * @brief StopZone::Display
+ * Dispalay stop zone next to barrel.
  */
-
-StopZone::StopZone()
-{
-}
-
-StopZone::~StopZone()
-{
-}
-
-
 void StopZone::Display()
 {
-    /* disable lightig and enable transparency */
+    float xBegin = position[0] > 0 ? position[0] - 1 : position[0] + 1;
+    float xEnd = position[0] > 0 ? position[0] - 1 - width : position[0] + 1 + width;
+    float y = 0.;
+    float z = position[2];
+
+    /* Disable lightig and enable transparency. */
     glDisable(GL_LIGHTING);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    /* draw stoping zone */
+    /* Draw stoping zone. */
     glBegin(GL_QUADS);
 
     /*** Bottom ***/
     glColor4f(150, 0, 0, 0.3);
-    glVertex3f(-5.0f,0.11f,25.f);
-    glVertex3f(5.0f,0.11f,25.f);
-    glVertex3f(5.0f,0.11f,0.f);
-    glVertex3f(-5.0f,0.11f,0.f);
+    glVertex3f(xBegin, y, z + heigth / 2);
+    glVertex3f(xEnd, y, z + heigth / 2);
+    glVertex3f(xEnd, y, z - heigth / 2);
+    glVertex3f(xBegin, y, z - heigth / 2);
 
     /*** Front ***/
     glColor4f(150, 0, 0, 0.8);
-    glVertex3f(-5.0f, 0.0f,0.0f);
-    glVertex3f(5.0f, 0.0f,0.0f);
+    glVertex3f(xBegin, y, z - heigth / 2);
+    glVertex3f(xEnd, y, z - heigth / 2);
     glColor4f(150, 0, 0, 0.1);
-    glVertex3f(5.0f, 4.0f,0.0f);
-    glVertex3f(-5.0f, 4.0f,0.0f);
+    glVertex3f(xEnd, y + 4.0f, z - heigth / 2);
+    glVertex3f(xBegin, y + 4.0f, z - heigth / 2);
 
 
     /*** Left ***/
     glColor4f(150, 0, 0, 0.8);
-    glVertex3f(-5.0f,0.0f,0.f);
-    glVertex3f(-5.0f,0.0f,25.f);
+    glVertex3f(xBegin, y, z - heigth / 2);
+    glVertex3f(xBegin, y, z + heigth / 2);
     glColor4f(150, 0, 0, 0.1);
-    glVertex3f(-5.0f,4.0f,25.f);
-    glVertex3f(-5.0f,4.0f,0.f);
+    glVertex3f(xBegin, y + 4.0f, z + heigth / 2);
+    glVertex3f(xBegin, y + 4.0f, z - heigth / 2);
 
     /*** Right ***/
     glColor4f(150, 0, 0, 0.8);
-    glVertex3f(5.0f,0.0f,0.f);
-    glVertex3f(5.0f,0.0f,25.f);
+    glVertex3f(xEnd, y, z - heigth / 2);
+    glVertex3f(xEnd, y, z + heigth / 2);
     glColor4f(150, 0, 0, 0.1);
-    glVertex3f(5.0f,4.0f,25.f);
-    glVertex3f(5.0f,4.0f,0.f);
+    glVertex3f(xEnd, y + 4.0f, z + heigth / 2);
+    glVertex3f(xEnd, y + 4.0f, z - heigth / 2);
 
     /*** Back ***/
     glColor4f(150, 0, 0, 0.8);
-    glVertex3f(-5.0f, 0.0f,25.0f);
-    glVertex3f(5.0f, 0.0f,25.0f);
+    glVertex3f(xBegin, y, z + heigth / 2);
+    glVertex3f(xEnd, y, z + heigth / 2);
     glColor4f(150, 0, 0, 0.1);
-    glVertex3f(5.0f, 4.0f,25.0f);
-    glVertex3f(-5.0f, 4.0f,25.0f);
+    glVertex3f(xEnd, y + 4.0f, z + heigth / 2);
+    glVertex3f(xBegin, y + 4.0f, z + heigth / 2);
 
     glEnd();
 
-    /* enable lighting and disable transparency */
+    /* Enable lighting and disable transparency. */
     glDisable (GL_BLEND);
     glEnable(GL_LIGHTING);
 }
