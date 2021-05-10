@@ -265,7 +265,7 @@ void MKWidget::DisplayMainCar() {
  */
 void MKWidget::GenerateCar(unsigned int i, bool init) {
 
-        GLfloat * color = new GLfloat[3] { 1., 0., 0. };
+        GLfloat * color = new GLfloat[3] { static_cast <float> (rand()) / static_cast <float> (RAND_MAX), static_cast <float> (rand()) / static_cast <float> (RAND_MAX), static_cast <float> (rand()) / static_cast <float> (RAND_MAX) };
 
         /* Get random percent of the road (0% left side of the road; 10% right side of the road). */
         float percentOfXRoad = (std::rand() % 100 + 1) / 100.;
