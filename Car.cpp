@@ -18,7 +18,7 @@ Car::Car(GLfloat * color_){
  *
  * @param iTimeElapsed : timer to synchronize displaying.
  */
-void Car::Display(uint64_t iTimeElapsed) {
+void Car::Display(uint64_t iTimeElapsed, bool activGiro) {
     glPushMatrix();
 
     /* Car settings */
@@ -130,19 +130,21 @@ void Car::Display(uint64_t iTimeElapsed) {
 
     glEnd();
 
-    glPopMatrix();
+    if (activGiro){
+        glPopMatrix();
 
-    /* Gyrophare */
-    /** Gyrophare Quadric **/
-    GLUquadric* quadrique1 = gluNewQuadric();
-    gluQuadricDrawStyle(quadrique1,GLU_FILL);
+        /* Gyrophare */
+        /** Gyrophare Quadric **/
+        GLUquadric* quadrique1 = gluNewQuadric();
+        gluQuadricDrawStyle(quadrique1,GLU_FILL);
 
-    /** Draw Gyrophare **/
-    glPushMatrix();
-    glTranslatef(-1.f,5.1f,-14.f);
-    drawGirophare(quadrique1, iTimeElapsed);
+        /** Draw Gyrophare **/
+        glPushMatrix();
+        glTranslatef(-1.f,5.1f,-14.f);
+        drawGirophare(quadrique1, iTimeElapsed);
 
-    glPopMatrix();
+        glPopMatrix();
+     }
 
     /* Window settings */
 

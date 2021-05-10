@@ -143,7 +143,6 @@ void MKWidget::keyPressEvent(QKeyEvent * event)
         case Qt::Key_Right:
               left_right = left_right + carWidth / 2 < roadWidth / 2 && activateMove ? left_right + 2. : left_right;
               degree = -3;
-              qDebug() << degree;
               break;
 
         case Qt::Key_P:
@@ -252,7 +251,7 @@ void MKWidget::DisplayMainCar() {
     glRotated(degree, 0 ,1., 0.);
 
     /* Main car */;
-    car->Display(m_TimeElapsed);
+    car->Display(m_TimeElapsed, true);
     glPopMatrix();
 }
 
@@ -315,7 +314,7 @@ void MKWidget::DisplayCars() {
         /* Translate position matrix. */
         glTranslated(pos[0], pos[1], pos[2]);
         /* Resfresh car printing. */
-        currentCar->Display(m_TimeElapsed);
+        currentCar->Display(m_TimeElapsed, false);
 
         /* Load main matrix. */
         glPopMatrix();

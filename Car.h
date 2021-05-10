@@ -22,7 +22,7 @@ public:
     Car(GLfloat * = new GLfloat[3]{0.25f, 0.25f, 0.25f});
 
     /* Displaying methods */
-    void Display(uint64_t);
+    void Display(uint64_t, bool);
     static void drawTier(GLUquadric*);
     static void drawGirophare(GLUquadric*, uint64_t);
     void decreaseZ(float decrement) { position[2] = position[2] - decrement; }; // Approach car.
