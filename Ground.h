@@ -23,15 +23,16 @@ private:
 
 public:
     /* Contructor */
-    Ground(uint64_t);
+    Ground();
 
     /* Methods */
-    void Display();
+    void LoadTextures();
+    void Display(uint64_t);
 
     /* Getters */
-    float getRoadWidth() const { return 50.; }
-    float getRoadHeight() const {return 200.; }
-    float getRoadSpeed() const { return roadSpeed; }
+    float GetRoadWidth() const { return 50.; }
+    float GetRoadHeight() const {return 200.; }
+    float GetRoadSpeed() const { return roadSpeed; }
 
     /* Destructor */
     ~Ground();

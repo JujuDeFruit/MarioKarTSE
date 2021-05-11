@@ -5,10 +5,19 @@
 #include <GL/glu.h>
 #include <QKeyEvent>
 #include <QTimer>
+#include <QApplication>
+#include <QDesktopWidget>
+#include <GL/glu.h>
+#include <stdlib.h>
+#include <windows.h>
+#include <stdlib.h>
+#include <time.h>
+#include <QDebug>
 
 #include "Car.h"
 #include "Barrel.h"
 #include "FuelBar.h"
+#include "StopZone.h"
 
 /**
  * @brief The MyGLWidget class
@@ -18,6 +27,7 @@
  * @param NB_OPPOSITE_CARS : numbers of opposite cars to generate.
  * @param CAM_POS : position {x, y, z} of the camera.
  * @param left_right : translation of main car.
+ * @param degree : rotation of main car.
  * @param m_TimeElapsed
  * @param m_AnimationTimer : timer to synchronize on.
  * @param ground : ground pointer.
@@ -37,11 +47,13 @@ private:
 
     float * CAM_POS = new float[3]{0.,25., 60.};
 
-    double left_right = 0.;
+    float left_right = 0.;
+    double degree = 0.;
 
     float m_TimeElapsed { 0.0f };
     QTimer m_AnimationTimer;
 
+    StopZone * zone;
     Ground * ground;
     Barrel * barrel;
     FuelBar * fuelBar;
@@ -51,6 +63,7 @@ private:
     GLfloat distBetOppCars;
 
     bool m_barrelPressed = false;
+    bool activateMove = true;
 
 public:
     /* Constructor */
@@ -62,13 +75,17 @@ private:
     virtual void resizeGL(int, int);
     virtual void paintGL();
     virtual void keyPressEvent(QKeyEvent* event);
+    virtual void keyReleaseEvent(QKeyEvent* event);
     virtual void mousePressEvent(QMouseEvent* event);
 
     /* Methods */
-    void generateCar(unsigned int, bool = false);
-    void displayCars();
-    void checkCollison();
+    void DisplayMainCar();
+    void GenerateCar(unsigned int, bool = false);
+    void DisplayCars();
+    void CheckCollison();
     void PrintTimer();
+    void StopAnimation();
+
 };
 
 # endif

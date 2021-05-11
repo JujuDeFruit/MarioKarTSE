@@ -24,12 +24,14 @@ SOURCES += Main.cpp Widget.cpp \
     Car.cpp \
     Ground.cpp \
     Barrel.cpp \
-    FuelBar.cpp
+    FuelBar.cpp \
+    StopZone.cpp
 HEADERS += Widget.h \
     Car.h \
     Ground.h \
     Barrel.h \
-    FuelBar.h
+    FuelBar.h \
+    StopZone.h
 
 RESOURCES += \
     res/textures.qrc

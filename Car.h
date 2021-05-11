@@ -22,15 +22,17 @@ public:
     Car(GLfloat * = new GLfloat[3]{0.25f, 0.25f, 0.25f});
 
     /* Displaying methods */
-    void Display(uint64_t);
-    static void drawTier(GLUquadric*);
-    static void drawGirophare(GLUquadric*, uint64_t);
-    void decreaseZ(float);
+    void Display(uint64_t, bool);
+    static void DrawTier(GLUquadric*);
+    static void DrawGirophare(GLUquadric*, uint64_t);
+    void DecreaseZ(float decrement) { position[2] = position[2] - decrement; }; // Approach car.
+    void DrawWindows();
+    void DrawHeadLights();
 
     /* Getters */
-    float getWidth() const { return 6.; }
-    float getHeight() const { return 19.; }
-    float * getPosition() { return position; }
+    float GetWidth() const { return 6.; }
+    float GetHeight() const { return 19.; }
+    float * GetPosition() { return position; }
 
     /* Setters */
     void setPosition(float * pos) { position = pos; }

@@ -22,12 +22,9 @@ public:
     FuelBar(float * CAM_POS) { value = MAX; XYZ = CAM_POS; };
 
     /* Methods */
-    void Decrease(float v) { value -= v; };
+    void Decrease(float v);
     void Fill() { value = MAX; };
     void Display();
-
-    /* Getter */
-    float GetValue() const { return value; }
 };
 
 #endif // FUELBAR_H
