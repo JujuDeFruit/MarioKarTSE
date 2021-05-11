@@ -8,6 +8,7 @@
 
 #include "Ground.h"
 #include "StopZone.h"
+#include "Car.h"
 
 /**
  * Manage fuel barrels displayed along the road.
@@ -36,8 +37,9 @@ public:
     /* Methods. */
     void LoadTextures();
     void Display(Ground *, bool, bool);
-    void drawBarrel(GLUquadric *);
-    void drawArea();
+    void DrawBarrel(GLUquadric *);
+    void DrawArea();
+    bool CarInStopZone(Car *);
 
     /* Getter. */
     int GetXPos() const { return xPos; }

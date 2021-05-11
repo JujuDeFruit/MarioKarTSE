@@ -17,7 +17,7 @@
 #include "Car.h"
 #include "Barrel.h"
 #include "FuelBar.h"
-#include "stopzone.h"
+#include "StopZone.h"
 
 /**
  * @brief The MyGLWidget class
@@ -47,7 +47,7 @@ private:
 
     float * CAM_POS = new float[3]{0.,25., 60.};
 
-    double left_right = 0.;
+    float left_right = 0.;
     double degree = 0.;
 
     float m_TimeElapsed { 0.0f };

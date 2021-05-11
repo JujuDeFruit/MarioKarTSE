@@ -141,7 +141,7 @@ void Car::Display(uint64_t iTimeElapsed, bool activGiro) {
         /** Draw Gyrophare **/
         glPushMatrix();
         glTranslatef(-1.f,5.1f,-14.f);
-        drawGirophare(quadrique1, iTimeElapsed);
+        DrawGirophare(quadrique1, iTimeElapsed);
 
         glPopMatrix();
      }
@@ -162,11 +162,11 @@ void Car::Display(uint64_t iTimeElapsed, bool activGiro) {
 
     /** Draw Window **/
 
-    drawWindows();
+    DrawWindows();
 
     /* Headlights */
 
-    drawHeadLights();
+    DrawHeadLights();
 
     /* Tiers */
 
@@ -176,25 +176,25 @@ void Car::Display(uint64_t iTimeElapsed, bool activGiro) {
     /** Front left wheel **/
     glPushMatrix();
     glTranslatef(-3.2f,0.f,-20.f);
-    drawTier(quadrique);
+    DrawTier(quadrique);
     glPopMatrix();
 
     /** Front right wheel **/
     glPushMatrix();
     glTranslatef(2.8f,0.f,-20.f);
-    drawTier(quadrique);
+    DrawTier(quadrique);
     glPopMatrix();
 
     /** Back left wheel **/
     glPushMatrix();
     glTranslatef(-3.2f,0.f,-10.f);
-    drawTier(quadrique);
+    DrawTier(quadrique);
     glPopMatrix();
 
     /** Back right wheel **/
     glPushMatrix();
     glTranslatef(2.8f,0.f,-10.f);
-    drawTier(quadrique);
+    DrawTier(quadrique);
     glPopMatrix();
 
 
@@ -205,12 +205,12 @@ void Car::Display(uint64_t iTimeElapsed, bool activGiro) {
 
 
 /**
- * @brief Car::drawTier
+ * @brief Car::DrawTier
  * Draw tiers, and refresh them on the screen.
  *
  * @param quadrique to draw tier
  */
-void Car::drawTier(GLUquadric* quadrique){
+void Car::DrawTier(GLUquadric* quadrique){
     /* Material */
     GLfloat ambient_wheel[] = {0.f, 0.f, 0.f, 1.0f};
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambient_wheel);
@@ -242,7 +242,7 @@ void Car::drawTier(GLUquadric* quadrique){
  * @param quadrique : quadrique to draw gyrophare.
  * @param iTimeElapsed : timer to synchronize on.
  */
-void Car::drawGirophare(GLUquadric* quadrique, uint64_t iTimeElapsed){
+void Car::DrawGirophare(GLUquadric* quadrique, uint64_t iTimeElapsed){
 
     /* light gyrophare */
     GLfloat light_tab[] = { -1.f,5.65f,-14.f, 1.f };
@@ -268,7 +268,12 @@ void Car::drawGirophare(GLUquadric* quadrique, uint64_t iTimeElapsed){
     glPopMatrix();
 }
 
-void Car::drawWindows(){
+
+/**
+ * @brief Car::DrawWindows
+ * Draw windows on the car
+ */
+void Car::DrawWindows(){
 
     glDisable(GL_LIGHTING);
     glEnable(GL_BLEND);
@@ -332,7 +337,12 @@ void Car::drawWindows(){
     glEnable(GL_LIGHTING);
 }
 
-void Car::drawHeadLights(){
+
+/**
+ * @brief Car::DrawHeadLights
+ * Draw head lights on the car
+ */
+void Car::DrawHeadLights(){
 
     /** Headlights settings **/
     GLfloat colorDiffuse5_tab[] = {1.f, 0.01f, 0.01f, 1.f};

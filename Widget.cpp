@@ -115,7 +115,7 @@ void MKWidget::paintGL()
     DisplayCars();
     CheckCollison();
 
-    barrel->Display(ground, m_barrelPressed,activateMove);
+    barrel->Display(ground, m_barrelPressed, activateMove);
     m_barrelPressed = false;
 }
 
@@ -130,24 +130,26 @@ void MKWidget::keyPressEvent(QKeyEvent * event)
     const float roadWidth = ground->GetRoadWidth();
     const float carWidth = car->GetWidth();
 
-
     switch(event->key())
     {
         /* Move car to left side, and make sure car does not get out of the road. */
         case Qt::Key_Left:
               left_right = left_right - carWidth / 2 > - roadWidth / 2 && activateMove ? left_right - 2. : left_right;
+              car->setPosition(new float[3] { left_right, 0., 0. });
               degree = 3;
               break;
 
         /* Move car to right side, and make sure car does not get out of the road. */
         case Qt::Key_Right:
               left_right = left_right + carWidth / 2 < roadWidth / 2 && activateMove ? left_right + 2. : left_right;
+              car->setPosition(new float[3] { left_right, 0., 0. });
               degree = -3;
               break;
 
         case Qt::Key_P:
-            StopAnimation();
-            // add Pause label
+            if(barrel->CarInStopZone(car))
+                StopAnimation();
+            // Add Ppause label.
             break;
 
         case Qt::Key_Q:
@@ -167,12 +169,12 @@ void MKWidget::keyPressEvent(QKeyEvent * event)
     update();
 }
 
+
 /**
  * Keyboard interaction method
  *
  * @param event : key release event
  */
-
 void MKWidget::keyReleaseEvent(QKeyEvent *event)
 {
     if (!event->isAutoRepeat())
@@ -222,7 +224,7 @@ void MKWidget::mousePressEvent(QMouseEvent *event)
 
         glPushMatrix();
         glTranslated(barrel->GetXPos(), 5.f, barrel->GetZPos());
-        barrel->drawBarrel(quadrique);
+        barrel->DrawBarrel(quadrique);
         glPopMatrix();
 
         gluDeleteQuadric(quadrique);
@@ -305,8 +307,9 @@ void MKWidget::DisplayCars() {
 
         /* Decrease car's depth. */
         if(activateMove){
-            currentCar->decreaseZ(ground->GetRoadSpeed() + 3.5);
+            currentCar->DecreaseZ(ground->GetRoadSpeed() + 3.5);
         }
+
         float * pos = currentCar->GetPosition();
 
         if(pos[2] <  - CAM_POS[2]) GenerateCar(i);

@@ -23,11 +23,11 @@ public:
 
     /* Displaying methods */
     void Display(uint64_t, bool);
-    static void drawTier(GLUquadric*);
-    static void drawGirophare(GLUquadric*, uint64_t);
-    void decreaseZ(float decrement) { position[2] = position[2] - decrement; }; // Approach car.
-    void drawWindows();
-    void drawHeadLights();
+    static void DrawTier(GLUquadric*);
+    static void DrawGirophare(GLUquadric*, uint64_t);
+    void DecreaseZ(float decrement) { position[2] = position[2] - decrement; }; // Approach car.
+    void DrawWindows();
+    void DrawHeadLights();
 
     /* Getters */
     float GetWidth() const { return 6.; }

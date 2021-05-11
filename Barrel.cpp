@@ -2,6 +2,8 @@
 #include "Widget.h"
 
 
+#include <iostream>
+
 /**
  * Constructor of Barrel
  */
@@ -93,7 +95,7 @@ void Barrel::Display( Ground * ground,  bool barrelPressed, bool activateMove) {
         /* Draw Barrel */
         glPushMatrix();
         glTranslated(xPos, 5.f, zPos); // Translation
-        drawBarrel(quadrique);
+        DrawBarrel(quadrique);
         glPopMatrix();
 
         float * position = new float[3] { xPos, 5.0f, zPos};
@@ -120,7 +122,7 @@ void Barrel::Display( Ground * ground,  bool barrelPressed, bool activateMove) {
  *
  * @param quadrique : barrel quadric object
  */
-void Barrel::drawBarrel(GLUquadric * quadrique){
+void Barrel::DrawBarrel(GLUquadric * quadrique){
 
    // glPushMatrix();
     glRotated(90., 1., 0., 0.);        // Rotate around axis
@@ -143,7 +145,7 @@ void Barrel::drawBarrel(GLUquadric * quadrique){
  * Draw area to stop car and fill the car.
  * @param xPos : x position of the barrel.
  */
-void Barrel::drawArea() {
+void Barrel::DrawArea() {
 
     int xBegin = xPos > 0 ? xPos - 1 : xPos + 1;
     int xEnd = xPos > 0 ? xPos - 1 - areaSide : xPos + 1 + areaSide;
@@ -156,4 +158,19 @@ void Barrel::drawArea() {
     glVertex3f(xBegin, 1., zPos + areaSide / 2);
     glEnd();
     glPopMatrix();
+}
+
+
+
+bool Barrel::CarInStopZone(Car * car) {
+
+    if ((car->GetPosition()[0] >= stopZone->GetXRange()[0]
+            && car->GetPosition()[0] <= stopZone->GetXRange()[1] - car->GetWidth() / 2.)
+        && (car->GetPosition()[1] + car->GetHeight() / 2. <= stopZone->GetZRange()[1] && car->GetPosition()[1] + car->GetHeight() / 2. >= stopZone->GetZRange()[0]
+        || car->GetPosition()[1] - car->GetHeight() / 2. <= stopZone->GetZRange()[1] && car->GetPosition()[1] - car->GetHeight() / 2. >= stopZone->GetZRange()[0]
+            || car->GetPosition()[1] <= stopZone->GetZRange()[1] && car->GetPosition()[1] >= stopZone->GetZRange()[0])
+            ) {
+        return true;
+    }
+    return false;
 }
