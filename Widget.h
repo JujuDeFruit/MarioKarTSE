@@ -4,15 +4,13 @@
 #include <QOpenGLWidget>
 #include <GL/glu.h>
 #include <QKeyEvent>
+#include <QElapsedTimer>
 #include <QTimer>
 #include <QApplication>
 #include <QDesktopWidget>
 #include <GL/glu.h>
 #include <stdlib.h>
 #include <windows.h>
-#include <stdlib.h>
-#include <time.h>
-#include <QDebug>
 
 #include "Car.h"
 #include "Barrel.h"
@@ -37,6 +35,7 @@
  * @param oppositeCars : pointer of pointer of cars to generate opposite cars.
  * @param distBetOppCars : distance between 2 opposite cars.
  * @param m_barrelPressed : check if barrel is clicked or not.
+ * @param score : score of the player. Score is increased by 1 for each exceeded opposite car.
  */
 class MKWidget : public QOpenGLWidget
 {
@@ -64,6 +63,9 @@ private:
 
     bool m_barrelPressed = false;
     bool activateMove = true;
+
+    int score = 0;
+    QElapsedTimer * timer;
 
 public:
     /* Constructor */

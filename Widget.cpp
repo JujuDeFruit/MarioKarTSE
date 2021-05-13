@@ -1,5 +1,8 @@
 #include "Widget.h"
 
+#include <iostream>
+
+
 /**
  * Constructor of main openGL Widget
  *
@@ -37,6 +40,10 @@ MKWidget::MKWidget(QOpenGLWidget * parent):QOpenGLWidget(parent)
 
     /* Create barrel */
     barrel = new Barrel();
+
+    /* Start timer. */
+    timer = new QElapsedTimer();
+    timer->start();
 
     /* Create and set timer */
     m_AnimationTimer.setInterval(15);
@@ -88,6 +95,7 @@ void MKWidget::resizeGL(int width, int height)
  */
 void MKWidget::paintGL()
 {
+
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
     /* Reset current matrix. */
@@ -117,6 +125,8 @@ void MKWidget::paintGL()
 
     barrel->Display(ground, m_barrelPressed, activateMove);
     m_barrelPressed = false;
+
+    PrintTimer();
 }
 
 
@@ -147,9 +157,9 @@ void MKWidget::keyPressEvent(QKeyEvent * event)
               break;
 
         case Qt::Key_P:
+        /* Add Pause label. */
             if(barrel->CarInStopZone(car))
                 StopAnimation();
-            // Add Ppause label.
             break;
 
         case Qt::Key_Q:
@@ -287,6 +297,9 @@ void MKWidget::GenerateCar(unsigned int i, bool init) {
 
         /* Fill array. */
         *(oppositeCars + i) = oppositeCar;
+
+        /* If a new car was generated and it was not an initialization of the scene, then increase score. */
+        score = init ? score : score + 1;
 }
 
 
@@ -340,14 +353,14 @@ void MKWidget::CheckCollison() {
 
         /* Check for collisions with main car. */
         if (
-                (-oppPos[2] - oppositeCars[i]->GetHeight() >= zCarPos - car->GetHeight()/2
-                 && -oppPos[2] - oppositeCars[i]->GetHeight() <= zCarPos + car->GetHeight()/2.
-                 ||-oppPos[2] + oppositeCars[i]->GetHeight() >= zCarPos - car->GetHeight()/2
-                 && -oppPos[2] + oppositeCars[i]->GetHeight() <= zCarPos + car->GetHeight()/2)
-                && (oppPos[0] <= xCarPos
-                 && oppPos[0] + oppositeCars[i]->GetWidth() > xCarPos
-                 || oppPos[0] < xCarPos + car->GetWidth()
-                 && oppPos[0] + oppositeCars[i]->GetWidth() >= xCarPos + car->GetWidth())
+                ((-oppPos[2] - oppositeCars[i]->GetHeight() >= zCarPos - car->GetHeight()/2
+                 && -oppPos[2] - oppositeCars[i]->GetHeight() <= zCarPos + car->GetHeight()/2.)
+                 || (-oppPos[2] + oppositeCars[i]->GetHeight() >= zCarPos - car->GetHeight()/2
+                 && -oppPos[2] + oppositeCars[i]->GetHeight() <= zCarPos + car->GetHeight()/2))
+                && ((oppPos[0] <= xCarPos
+                 && oppPos[0] + oppositeCars[i]->GetWidth() > xCarPos)
+                 ||( oppPos[0] < xCarPos + car->GetWidth()
+                 && oppPos[0] + oppositeCars[i]->GetWidth() >= xCarPos + car->GetWidth()))
             ) {
                 exit(0);
         }
@@ -361,12 +374,17 @@ void MKWidget::CheckCollison() {
  */
 void MKWidget::PrintTimer()
 {
-  /*glColor3f(1., 1., 1.);
-  glRasterPos2f(0, 0);
-  char * timer, font;
-  for (int i = 0; i < (int)strlen(timer); i++) {
-    glutBitmapCharacter(font, timer[i]);
-  }*/
+
+    /* New painter to print text on screen. */
+    QPainter painter(this);
+
+    painter.setPen(Qt::black);
+
+    QFont font("Monospace", 30);
+    painter.setFont(font);
+
+    painter.drawText(width() / 10, height() / 20, QString("Score : ") + QString::number(score) + QString(" pts"));
+    painter.drawText(width() / 2, height() / 20, QString("Timer : ") + QString::number(timer->elapsed() / 1000) + QString(" sec"));
 }
 
 
