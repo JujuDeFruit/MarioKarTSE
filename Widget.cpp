@@ -14,11 +14,11 @@ MKWidget::MKWidget(QOpenGLWidget * parent):QOpenGLWidget(parent)
     setFixedSize(WIN, WIN);
     move(QApplication::desktop()->screen()->rect().center() - rect().center());
 
-    /* Set interval to refresh window* */
-    connect(&m_AnimationTimer,  &QTimer::timeout, [&] {
-        m_TimeElapsed += 1.0f;
-        update();
-    });
+    m_AnimationTimer = new QTimer(this);
+    /* Create and set timer */
+    m_AnimationTimer->setInterval(15);
+    connect(m_AnimationTimer, SIGNAL(timeout()),this, SLOT(refresh()));
+    m_AnimationTimer->start();
 
     /* Initialize arrays of pointers of cars */
     oppositeCars = new Car*[NB_OPPOSITE_CARS];
@@ -45,9 +45,14 @@ MKWidget::MKWidget(QOpenGLWidget * parent):QOpenGLWidget(parent)
     timer = new QElapsedTimer();
     timer->start();
 
-    /* Create and set timer */
-    m_AnimationTimer.setInterval(15);
-    m_AnimationTimer.start();
+}
+
+/**
+ * Refresh the window
+ */
+void MKWidget::refresh(){
+    m_TimeElapsed += 1.0f;
+    update();
 }
 
 
@@ -60,6 +65,11 @@ void MKWidget::initializeGL()
     glClearColor(0.5f,0.5f,0.5f,1.0f); // grey
 
     glEnable(GL_DEPTH_TEST);
+    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();                           // Load identity matrix and set it as current.
+    gluPerspective(70.f, 1, 0.1f, 500.f);
 
     /* Light activation */
     glEnable(GL_LIGHTING);
@@ -85,23 +95,33 @@ void MKWidget::initializeGL()
  */
 void MKWidget::resizeGL(int width, int height)
 {
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();                           // Load identity matrix and set it as current.
+    gluPerspective(70.f, 1, 0.1f, 500.f);
+
     /* Viewport definiton, printing area */
     glViewport(0, 0, width, height);
 }
 
 
 /**
- * Overriding OpenGL printing method.
+ * Overriding paintEvent printing method.
  */
-void MKWidget::paintGL()
-{
+
+void MKWidget::paintEvent(QPaintEvent *){
+
+    QPainter painter(this);
+    painter.beginNativePainting();
+
+
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
 
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-    /* Reset current matrix. */
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();                           // Load identity matrix and set it as current.
-    gluPerspective(70.f, 1, 0.1f, 500.f);
+    glEnable(GL_DEPTH_TEST);
 
     glMatrixMode(GL_MODELVIEW);                 // Set items in 3D representation.
     glLoadIdentity();
@@ -126,9 +146,19 @@ void MKWidget::paintGL()
     barrel->Display(ground, m_barrelPressed, activateMove);
     m_barrelPressed = false;
 
-    PrintTimer();
-}
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
 
+    painter.endNativePainting();
+    glDisable(GL_DEPTH_TEST);
+
+
+    /* painter to print text on screen. */
+    PrintTimer();
+
+}
 
 /**
  * Keyboard interaction method
@@ -167,7 +197,7 @@ void MKWidget::keyPressEvent(QKeyEvent * event)
 
         /* Default case. */
         default:
-        { 
+        {
             /* Ignore event. */
             event->ignore();
             return;
@@ -374,10 +404,11 @@ void MKWidget::CheckCollison() {
  */
 void MKWidget::PrintTimer()
 {
-
-    /* New painter to print text on screen. */
     QPainter painter(this);
 
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    /* New painter to print text on screen. */
     painter.setPen(Qt::black);
 
     QFont font("Monospace", 30);
@@ -385,6 +416,8 @@ void MKWidget::PrintTimer()
 
     painter.drawText(width() / 10, height() / 20, QString("Score : ") + QString::number(score) + QString(" pts"));
     painter.drawText(width() / 2, height() / 20, QString("Timer : ") + QString::number(timer->elapsed() / 1000) + QString(" sec"));
+
+    painter.end();
 }
 
 
@@ -392,16 +425,18 @@ void MKWidget::PrintTimer()
  * Stop all movement in the scene.
  */
 void MKWidget::StopAnimation(){
-    if(m_AnimationTimer.isActive())
+    if(m_AnimationTimer->isActive())
     {
-          m_AnimationTimer.stop();
+          m_AnimationTimer->stop();
           activateMove = false;
 
     }
     else
     {
-        m_AnimationTimer.start();
+        m_AnimationTimer->start();
         activateMove = true;
     }
 
 }
+
+

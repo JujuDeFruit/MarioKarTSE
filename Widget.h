@@ -39,6 +39,8 @@
  */
 class MKWidget : public QOpenGLWidget
 {
+    Q_OBJECT
+
 private:
     /* Const declaration */
     const unsigned int WIN = 900;
@@ -50,7 +52,7 @@ private:
     double degree = 0.;
 
     float m_TimeElapsed { 0.0f };
-    QTimer m_AnimationTimer;
+    QTimer * m_AnimationTimer;
 
     StopZone * zone;
     Ground * ground;
@@ -75,10 +77,11 @@ private:
     /* Herited methods from QOpenGLWidget. Overrided methods */
     virtual void initializeGL();
     virtual void resizeGL(int, int);
-    virtual void paintGL();
+  //  virtual void paintGL();
     virtual void keyPressEvent(QKeyEvent* event);
     virtual void keyReleaseEvent(QKeyEvent* event);
     virtual void mousePressEvent(QMouseEvent* event);
+    virtual void paintEvent(QPaintEvent *event);
 
     /* Methods */
     void DisplayMainCar();
@@ -87,6 +90,10 @@ private:
     void CheckCollison();
     void PrintTimer();
     void StopAnimation();
+
+private slots:
+    void refresh();
+
 
 };
 
