@@ -143,7 +143,7 @@ void MKWidget::paintEvent(QPaintEvent *){
     DisplayCars();
     CheckCollison();
 
-    barrel->Display(ground, m_barrelPressed, activateMove);
+    barrel->Display(ground, m_barrelPressed, activateMove, pause);
     m_barrelPressed = false;
 
     glMatrixMode(GL_PROJECTION);
@@ -157,6 +157,7 @@ void MKWidget::paintEvent(QPaintEvent *){
 
     /* painter to print text on screen. */
     PrintTimer();
+
     if (pause){
        PrintPause();
     }
@@ -196,8 +197,6 @@ void MKWidget::keyPressEvent(QKeyEvent * event)
             }else{
                 pause = true;
                 StopAnimation();
-
-                // add something to stop barrel press
             }
 
             break;
@@ -284,7 +283,7 @@ void MKWidget::mousePressEvent(QMouseEvent *event)
         hits = glRenderMode(GL_RENDER);
         if (hits == 1){
             m_barrelPressed = true;
-            fuelBar->Fill();
+            fuelBar->Fill(!(pause));
             event->accept();
             update();
         }

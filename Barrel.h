@@ -36,7 +36,7 @@ public:
 
     /* Methods. */
     void LoadTextures();
-    void Display(Ground *, bool, bool);
+    void Display(Ground *, bool, bool, bool);
     void DrawBarrel(GLUquadric *);
     void DrawArea();
     bool CarInStopZone(Car *);

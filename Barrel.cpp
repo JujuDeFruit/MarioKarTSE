@@ -56,7 +56,7 @@ void Barrel::LoadTextures() {
  * @param ground : Ground pointer
  * @param barrelPressed : is the barrel pressed by user ?
  */
-void Barrel::Display( Ground * ground,  bool barrelPressed, bool activateMove) {
+void Barrel::Display( Ground * ground,  bool barrelPressed, bool activateMove, bool pause) {
 
     if (!created) {
         if (!(std::rand() % 100)) {
@@ -84,7 +84,7 @@ void Barrel::Display( Ground * ground,  bool barrelPressed, bool activateMove) {
         glBindTexture(GL_TEXTURE_2D, textureID[0]);
 
         /* Change barrels color upon click */
-        if (barrelPressed || prevClicked_) {
+        if ((barrelPressed || prevClicked_) && (!pause)) {
             glColor3f(100.f, 0.f, 0.f);
             prevClicked_ = true;
         } else {
