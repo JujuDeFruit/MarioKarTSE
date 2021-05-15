@@ -176,14 +176,14 @@ void MKWidget::keyPressEvent(QKeyEvent * event)
         case Qt::Key_Left:
               left_right = left_right - carWidth / 2 > - roadWidth / 2 && activateMove ? left_right - 2. : left_right;
               car->setPosition(new float[3] { left_right, 0., 0. });
-              degree = 3;
+              degree = activateMove ? 3 : degree;
               break;
 
         /* Move car to right side, and make sure car does not get out of the road. */
         case Qt::Key_Right:
               left_right = left_right + carWidth / 2 < roadWidth / 2 && activateMove ? left_right + 2. : left_right;
               car->setPosition(new float[3] { left_right, 0., 0. });
-              degree = -3;
+              degree  = activateMove ? -3 : degree;
               break;
 
         case Qt::Key_P:
