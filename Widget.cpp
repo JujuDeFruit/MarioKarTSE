@@ -157,6 +157,9 @@ void MKWidget::paintEvent(QPaintEvent *){
 
     /* painter to print text on screen. */
     PrintTimer();
+    if (pause){
+       PrintPause();
+    }
 
 }
 
@@ -187,9 +190,16 @@ void MKWidget::keyPressEvent(QKeyEvent * event)
               break;
 
         case Qt::Key_P:
-        /* Add Pause label. */
-            if(barrel->CarInStopZone(car))
+
+            if(barrel->CarInStopZone(car)){
                 StopAnimation();
+            }else{
+                pause = true;
+                StopAnimation();
+
+                // add something to stop barrel press
+            }
+
             break;
 
         case Qt::Key_Q:
@@ -420,6 +430,28 @@ void MKWidget::PrintTimer()
     painter.end();
 }
 
+/**
+ * @brief MKWidget::PrintPause
+ * Print Pause on screen.
+ */
+void MKWidget::PrintPause()
+{
+    QPainter painter(this);
+
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setPen(Qt::black);
+
+    QFont font("Monospace", 70);
+    painter.setFont(font);
+    painter.drawText(width() / 3, height() / 2, QString("Pause"));
+
+    QFont font2("Monospace", 15);
+    painter.setFont(font2);
+    painter.drawText(width() / 3, 2*height() /3, QString("Press P to resume"));
+    painter.end();
+}
+
+
 
 /**
  * Stop all movement in the scene.
@@ -428,15 +460,17 @@ void MKWidget::StopAnimation(){
     if(m_AnimationTimer->isActive())
     {
           m_AnimationTimer->stop();
-          activateMove = false;
-
+          activateMove = false; 
     }
     else
     {
         m_AnimationTimer->start();
         activateMove = true;
+        pause = false;
     }
 
 }
+
+
 
 

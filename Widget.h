@@ -65,6 +65,7 @@ private:
 
     bool m_barrelPressed = false;
     bool activateMove = true;
+    bool pause = false;
 
     int score = 0;
     QElapsedTimer * timer;
@@ -90,6 +91,7 @@ private:
     void CheckCollison();
     void PrintTimer();
     void StopAnimation();
+    void PrintPause();
 
 private slots:
     void refresh();
