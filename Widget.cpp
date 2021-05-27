@@ -1,5 +1,8 @@
 #include "Widget.h"
 
+#include <iostream>
+
+
 /**
  * Constructor of main openGL Widget
  *
@@ -11,11 +14,11 @@ MKWidget::MKWidget(QOpenGLWidget * parent):QOpenGLWidget(parent)
     setFixedSize(WIN, WIN);
     move(QApplication::desktop()->screen()->rect().center() - rect().center());
 
-    /* Set interval to refresh window* */
-    connect(&m_AnimationTimer,  &QTimer::timeout, [&] {
-        m_TimeElapsed += 1.0f;
-        update();
-    });
+    m_AnimationTimer = new QTimer(this);
+    /* Create and set timer */
+    m_AnimationTimer->setInterval(15);
+    connect(m_AnimationTimer, SIGNAL(timeout()),this, SLOT(refresh()));
+    m_AnimationTimer->start();
 
     /* Initialize arrays of pointers of cars */
     oppositeCars = new Car*[NB_OPPOSITE_CARS];
@@ -38,9 +41,18 @@ MKWidget::MKWidget(QOpenGLWidget * parent):QOpenGLWidget(parent)
     /* Create barrel */
     barrel = new Barrel();
 
-    /* Create and set timer */
-    m_AnimationTimer.setInterval(15);
-    m_AnimationTimer.start();
+    /* Start timer. */
+    timer = new QElapsedTimer();
+    timer->start();
+
+}
+
+/**
+ * Refresh the window
+ */
+void MKWidget::refresh(){
+    m_TimeElapsed += 1.0f;
+    update();
 }
 
 
@@ -53,6 +65,11 @@ void MKWidget::initializeGL()
     glClearColor(0.5f,0.5f,0.5f,1.0f); // grey
 
     glEnable(GL_DEPTH_TEST);
+    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();                           // Load identity matrix and set it as current.
+    gluPerspective(70.f, 1, 0.1f, 500.f);
 
     /* Light activation */
     glEnable(GL_LIGHTING);
@@ -78,22 +95,33 @@ void MKWidget::initializeGL()
  */
 void MKWidget::resizeGL(int width, int height)
 {
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();                           // Load identity matrix and set it as current.
+    gluPerspective(70.f, 1, 0.1f, 500.f);
+
     /* Viewport definiton, printing area */
     glViewport(0, 0, width, height);
 }
 
 
 /**
- * Overriding OpenGL printing method.
+ * Overriding paintEvent printing method.
  */
-void MKWidget::paintGL()
-{
+
+void MKWidget::paintEvent(QPaintEvent *){
+
+    QPainter painter(this);
+    painter.beginNativePainting();
+
+
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-    /* Reset current matrix. */
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();                           // Load identity matrix and set it as current.
-    gluPerspective(70.f, 1, 0.1f, 500.f);
+    glEnable(GL_DEPTH_TEST);
 
     glMatrixMode(GL_MODELVIEW);                 // Set items in 3D representation.
     glLoadIdentity();
@@ -115,10 +143,26 @@ void MKWidget::paintGL()
     DisplayCars();
     CheckCollison();
 
-    barrel->Display(ground, m_barrelPressed, activateMove);
+    barrel->Display(ground, m_barrelPressed, activateMove, pause);
     m_barrelPressed = false;
-}
 
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
+
+    painter.endNativePainting();
+    glDisable(GL_DEPTH_TEST);
+
+
+    /* painter to print text on screen. */
+    PrintTimer();
+
+    if (pause){
+       PrintPause();
+    }
+
+}
 
 /**
  * Keyboard interaction method
@@ -136,20 +180,25 @@ void MKWidget::keyPressEvent(QKeyEvent * event)
         case Qt::Key_Left:
               left_right = left_right - carWidth / 2 > - roadWidth / 2 && activateMove ? left_right - 2. : left_right;
               car->setPosition(new float[3] { left_right, 0., 0. });
-              degree = 3;
+              degree = activateMove ? 3 : degree;
               break;
 
         /* Move car to right side, and make sure car does not get out of the road. */
         case Qt::Key_Right:
               left_right = left_right + carWidth / 2 < roadWidth / 2 && activateMove ? left_right + 2. : left_right;
               car->setPosition(new float[3] { left_right, 0., 0. });
-              degree = -3;
+              degree  = activateMove ? -3 : degree;
               break;
 
         case Qt::Key_P:
-            if(barrel->CarInStopZone(car))
+
+            if(barrel->CarInStopZone(car)){
                 StopAnimation();
-            // Add Ppause label.
+            }else{
+                pause = true;
+                StopAnimation();
+            }
+
             break;
 
         case Qt::Key_Q:
@@ -157,7 +206,7 @@ void MKWidget::keyPressEvent(QKeyEvent * event)
 
         /* Default case. */
         default:
-        { 
+        {
             /* Ignore event. */
             event->ignore();
             return;
@@ -234,7 +283,7 @@ void MKWidget::mousePressEvent(QMouseEvent *event)
         hits = glRenderMode(GL_RENDER);
         if (hits == 1){
             m_barrelPressed = true;
-            fuelBar->Fill();
+            fuelBar->Fill(!(pause));
             event->accept();
             update();
         }
@@ -287,6 +336,9 @@ void MKWidget::GenerateCar(unsigned int i, bool init) {
 
         /* Fill array. */
         *(oppositeCars + i) = oppositeCar;
+
+        /* If a new car was generated and it was not an initialization of the scene, then increase score. */
+        score = init ? score : score + 1;
 }
 
 
@@ -340,14 +392,14 @@ void MKWidget::CheckCollison() {
 
         /* Check for collisions with main car. */
         if (
-                (-oppPos[2] - oppositeCars[i]->GetHeight() >= zCarPos - car->GetHeight()/2
-                 && -oppPos[2] - oppositeCars[i]->GetHeight() <= zCarPos + car->GetHeight()/2.
-                 ||-oppPos[2] + oppositeCars[i]->GetHeight() >= zCarPos - car->GetHeight()/2
-                 && -oppPos[2] + oppositeCars[i]->GetHeight() <= zCarPos + car->GetHeight()/2)
-                && (oppPos[0] <= xCarPos
-                 && oppPos[0] + oppositeCars[i]->GetWidth() > xCarPos
-                 || oppPos[0] < xCarPos + car->GetWidth()
-                 && oppPos[0] + oppositeCars[i]->GetWidth() >= xCarPos + car->GetWidth())
+                ((-oppPos[2] - oppositeCars[i]->GetHeight() >= zCarPos - car->GetHeight()/2
+                 && -oppPos[2] - oppositeCars[i]->GetHeight() <= zCarPos + car->GetHeight()/2.)
+                 || (-oppPos[2] + oppositeCars[i]->GetHeight() >= zCarPos - car->GetHeight()/2
+                 && -oppPos[2] + oppositeCars[i]->GetHeight() <= zCarPos + car->GetHeight()/2))
+                && ((oppPos[0] <= xCarPos
+                 && oppPos[0] + oppositeCars[i]->GetWidth() > xCarPos)
+                 ||( oppPos[0] < xCarPos + car->GetWidth()
+                 && oppPos[0] + oppositeCars[i]->GetWidth() >= xCarPos + car->GetWidth()))
             ) {
                 exit(0);
         }
@@ -361,29 +413,63 @@ void MKWidget::CheckCollison() {
  */
 void MKWidget::PrintTimer()
 {
-  /*glColor3f(1., 1., 1.);
-  glRasterPos2f(0, 0);
-  char * timer, font;
-  for (int i = 0; i < (int)strlen(timer); i++) {
-    glutBitmapCharacter(font, timer[i]);
-  }*/
+    QPainter painter(this);
+
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    /* New painter to print text on screen. */
+    painter.setPen(Qt::black);
+
+    QFont font("Monospace", 30);
+    painter.setFont(font);
+
+    painter.drawText(width() / 10, height() / 20, QString("Score : ") + QString::number(score) + QString(" pts"));
+    painter.drawText(width() / 2, height() / 20, QString("Timer : ") + QString::number(timer->elapsed() / 1000) + QString(" sec"));
+
+    painter.end();
 }
+
+/**
+ * @brief MKWidget::PrintPause
+ * Print Pause on screen.
+ */
+void MKWidget::PrintPause()
+{
+    QPainter painter(this);
+
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setPen(Qt::black);
+
+    QFont font("Monospace", 70);
+    painter.setFont(font);
+    painter.drawText(width() / 3, height() / 2, QString("Pause"));
+
+    QFont font2("Monospace", 15);
+    painter.setFont(font2);
+    painter.drawText(width() / 3, 2*height() /3, QString("Press P to resume"));
+    painter.end();
+}
+
 
 
 /**
  * Stop all movement in the scene.
  */
 void MKWidget::StopAnimation(){
-    if(m_AnimationTimer.isActive())
+    if(m_AnimationTimer->isActive())
     {
-          m_AnimationTimer.stop();
-          activateMove = false;
-
+          m_AnimationTimer->stop();
+          activateMove = false; 
     }
     else
     {
-        m_AnimationTimer.start();
+        m_AnimationTimer->start();
         activateMove = true;
+        pause = false;
     }
 
 }
+
+
+
+

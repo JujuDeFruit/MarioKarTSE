@@ -23,7 +23,7 @@ public:
 
     /* Methods */
     void Decrease(float v);
-    void Fill() { value = MAX; };
+    void Fill(bool pause) { value = pause ? MAX : value; };
     void Display();
 };
 

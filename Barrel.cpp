@@ -16,7 +16,7 @@ Barrel::Barrel(){
     glGenTextures(1, textureID);
 
     xPos = 0;
-    zPos = -200;
+    zPos = zInitBarrel;
     speed = 2;
 
     stopZone = new StopZone();
@@ -56,7 +56,7 @@ void Barrel::LoadTextures() {
  * @param ground : Ground pointer
  * @param barrelPressed : is the barrel pressed by user ?
  */
-void Barrel::Display( Ground * ground,  bool barrelPressed, bool activateMove) {
+void Barrel::Display( Ground * ground,  bool barrelPressed, bool activateMove, bool pause) {
 
     if (!created) {
         if (!(std::rand() % 100)) {
@@ -69,8 +69,7 @@ void Barrel::Display( Ground * ground,  bool barrelPressed, bool activateMove) {
     }
     if (created) {
 
-        zPos = activateMove ? zPos += speed : zPos;
-        //zPos += speed;
+        zPos = activateMove ? zPos + speed : zPos;
 
         LoadTextures();
 
@@ -85,7 +84,7 @@ void Barrel::Display( Ground * ground,  bool barrelPressed, bool activateMove) {
         glBindTexture(GL_TEXTURE_2D, textureID[0]);
 
         /* Change barrels color upon click */
-        if (barrelPressed || prevClicked_) {
+        if ((barrelPressed || prevClicked_) && (!pause)) {
             glColor3f(100.f, 0.f, 0.f);
             prevClicked_ = true;
         } else {
@@ -147,8 +146,8 @@ void Barrel::DrawBarrel(GLUquadric * quadrique){
  */
 void Barrel::DrawArea() {
 
-    int xBegin = xPos > 0 ? xPos - 1 : xPos + 1;
-    int xEnd = xPos > 0 ? xPos - 1 - areaSide : xPos + 1 + areaSide;
+    int xBegin = xPos >= 0 ? xPos - 1 : xPos + 1;
+    int xEnd = xPos >= 0 ? xPos - 1 - areaSide : xPos + 1 + areaSide;
 
     glPushMatrix();
     glBegin(GL_QUADS);
@@ -164,13 +163,26 @@ void Barrel::DrawArea() {
 
 bool Barrel::CarInStopZone(Car * car) {
 
-    if ((car->GetPosition()[0] >= stopZone->GetXRange()[0]
-            && car->GetPosition()[0] <= stopZone->GetXRange()[1] - car->GetWidth() / 2.)
-        && (car->GetPosition()[1] + car->GetHeight() / 2. <= stopZone->GetZRange()[1] && car->GetPosition()[1] + car->GetHeight() / 2. >= stopZone->GetZRange()[0]
-        || car->GetPosition()[1] - car->GetHeight() / 2. <= stopZone->GetZRange()[1] && car->GetPosition()[1] - car->GetHeight() / 2. >= stopZone->GetZRange()[0]
-            || car->GetPosition()[1] <= stopZone->GetZRange()[1] && car->GetPosition()[1] >= stopZone->GetZRange()[0])
-            ) {
-        return true;
+    if (xPos < 0) {
+        if ((car->GetPosition()[0] >= stopZone->GetXRange()[0]
+                && car->GetPosition()[0] <= stopZone->GetXRange()[1] - car->GetWidth() / 2.)
+            && ((car->GetPosition()[2] + car->GetHeight() / 2. <= stopZone->GetZRange()[1] && car->GetPosition()[2] + car->GetHeight() / 2. >= stopZone->GetZRange()[0])
+            || (car->GetPosition()[2] - car->GetHeight() / 2. <= stopZone->GetZRange()[1] && car->GetPosition()[2] - car->GetHeight() / 2. >= stopZone->GetZRange()[0])
+                || (car->GetPosition()[2] <= stopZone->GetZRange()[1] && car->GetPosition()[2] >= stopZone->GetZRange()[0]))
+                ) {
+            return true;
+        }
     }
+    else if (xPos > 0) {
+        if ((car->GetPosition()[0] <= stopZone->GetXRange()[0]
+                && car->GetPosition()[0] >= stopZone->GetXRange()[1] + car->GetWidth() / 2.)
+                && ((car->GetPosition()[2] + car->GetHeight() / 2. <= stopZone->GetZRange()[1] && car->GetPosition()[2] + car->GetHeight() / 2. >= stopZone->GetZRange()[0])
+                || (car->GetPosition()[2] - car->GetHeight() / 2. <= stopZone->GetZRange()[1] && car->GetPosition()[2] - car->GetHeight() / 2. >= stopZone->GetZRange()[0])
+                    || (car->GetPosition()[2] <= stopZone->GetZRange()[1] && car->GetPosition()[2] >= stopZone->GetZRange()[0]))
+                    ) {
+            return true;
+        }
+    }
+
     return false;
 }

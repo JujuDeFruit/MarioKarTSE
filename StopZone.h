@@ -14,7 +14,7 @@ class StopZone
 private:
     /* Dimensions of area. */
     const float width = 25.;
-    const float height = 10.;
+    const float height = 15.;
 
     /* Current position of the barrel. */
     float * position;

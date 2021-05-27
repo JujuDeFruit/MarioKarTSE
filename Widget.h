@@ -4,15 +4,13 @@
 #include <QOpenGLWidget>
 #include <GL/glu.h>
 #include <QKeyEvent>
+#include <QElapsedTimer>
 #include <QTimer>
 #include <QApplication>
 #include <QDesktopWidget>
 #include <GL/glu.h>
 #include <stdlib.h>
 #include <windows.h>
-#include <stdlib.h>
-#include <time.h>
-#include <QDebug>
 
 #include "Car.h"
 #include "Barrel.h"
@@ -37,9 +35,12 @@
  * @param oppositeCars : pointer of pointer of cars to generate opposite cars.
  * @param distBetOppCars : distance between 2 opposite cars.
  * @param m_barrelPressed : check if barrel is clicked or not.
+ * @param score : score of the player. Score is increased by 1 for each exceeded opposite car.
  */
 class MKWidget : public QOpenGLWidget
 {
+    Q_OBJECT
+
 private:
     /* Const declaration */
     const unsigned int WIN = 900;
@@ -51,7 +52,7 @@ private:
     double degree = 0.;
 
     float m_TimeElapsed { 0.0f };
-    QTimer m_AnimationTimer;
+    QTimer * m_AnimationTimer;
 
     StopZone * zone;
     Ground * ground;
@@ -64,6 +65,10 @@ private:
 
     bool m_barrelPressed = false;
     bool activateMove = true;
+    bool pause = false;
+
+    int score = 0;
+    QElapsedTimer * timer;
 
 public:
     /* Constructor */
@@ -73,10 +78,11 @@ private:
     /* Herited methods from QOpenGLWidget. Overrided methods */
     virtual void initializeGL();
     virtual void resizeGL(int, int);
-    virtual void paintGL();
+  //  virtual void paintGL();
     virtual void keyPressEvent(QKeyEvent* event);
     virtual void keyReleaseEvent(QKeyEvent* event);
     virtual void mousePressEvent(QMouseEvent* event);
+    virtual void paintEvent(QPaintEvent *event);
 
     /* Methods */
     void DisplayMainCar();
@@ -85,6 +91,11 @@ private:
     void CheckCollison();
     void PrintTimer();
     void StopAnimation();
+    void PrintPause();
+
+private slots:
+    void refresh();
+
 
 };
 
