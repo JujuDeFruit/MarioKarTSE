@@ -17,6 +17,18 @@
 #include "FuelBar.h"
 #include "StopZone.h"
 
+
+#include "opencv2/imgproc.hpp"
+#include "opencv2/highgui.hpp"
+#include <opencv2/objdetect.hpp>
+
+#include <cstdio>
+#include <iostream>
+#include <vector>
+
+using namespace cv;
+using namespace std;
+
 /**
  * @brief The MyGLWidget class
  * Generate and manage OpenGL scene.
@@ -70,9 +82,25 @@ private:
     int score = 0;
     QElapsedTimer * timer;
 
+
+    VideoCapture cap;
+    CascadeClassifier hand_cascade;
+    int frameWidth=640;
+    int frameHeight=480;
+    bool stop = false;
+
+
+    std::vector<cv::Point> LeftPositions;
+    std::vector<cv::Point> RightPositions;
+
+    double error = 30;
+
+
 public:
     /* Constructor */
     MKWidget(QOpenGLWidget * parent = nullptr);
+
+
 
 private:
     /* Herited methods from QOpenGLWidget. Overrided methods */
@@ -92,6 +120,9 @@ private:
     void PrintTimer();
     void StopAnimation();
     void PrintPause();
+
+    void RotationCheck();
+    void DrawZonePos(cv::Mat);
 
 private slots:
     void refresh();

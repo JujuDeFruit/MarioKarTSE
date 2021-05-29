@@ -1,6 +1,6 @@
 #include "Widget.h"
+#include <QtMath>
 
-#include <iostream>
 
 
 /**
@@ -44,6 +44,25 @@ MKWidget::MKWidget(QOpenGLWidget * parent):QOpenGLWidget(parent)
     /* Start timer. */
     timer = new QElapsedTimer();
     timer->start();
+
+
+    /* Camera */
+
+    cap = VideoCapture(0); // open the default camera
+    cap.set(cv::CAP_PROP_FRAME_WIDTH,frameWidth);
+    cap.set(cv::CAP_PROP_FRAME_HEIGHT,frameHeight);
+    if(!cap.isOpened())  // check if we succeeded
+    {
+        std::cerr<<"Error openning the default camera"<<std::endl;
+    }
+
+
+    if( !hand_cascade.load( "C:/Users/COMPAQ/Desktop/pro/TestDetectMultiScale/fist3.xml" ) )
+    {
+        std::cerr<<"Error loading haarcascade"<<std::endl;
+    }
+    // Init output window
+    namedWindow("WebCam",1);
 
 }
 
@@ -109,7 +128,86 @@ void MKWidget::resizeGL(int width, int height)
  */
 
 void MKWidget::paintEvent(QPaintEvent *){
+    Mat frame,frame_gray;
+    std::vector<Rect> hands;
+    // Get frame
+    cap >> frame;
+    // Mirror effect
+    cv::flip(frame,frame,1);
+    // Convert to gray
+    cv::cvtColor(frame,frame_gray,COLOR_BGR2GRAY);
+    // Equalize graylevels
+    //        equalizeHist( frame_gray, frame_gray );
 
+
+    //-- Detect hands
+    hand_cascade.detectMultiScale( frame_gray, hands, 1.1, 4, 0, Size(60, 60) );
+
+
+    DrawZonePos(frame);
+
+
+    if (hands.size()>0 && hands.size()<3 ){  // limit to 2 hands
+
+        // Draw green rectangle
+        for (int i=0;i<(int)hands.size();i++){
+
+            // check if hand on the left side of screen
+            if (hands[i].x<= (frameWidth/3 - hands[i].width) ){
+                rectangle(frame,hands[i],cv::Scalar(0,255,0),2);
+               // std::cout <<"x_g:"<< hands[i].x<<" y_g:"<< hands[i].y<<std::endl;
+
+                // Add the left hand coordinants to the list
+                cv::Point p;
+                p.x = hands[i].x;
+                p.y = hands[i].y;
+                LeftPositions.push_back(p);
+            }
+
+            // check if hand on the right side of the screen
+            if (hands[i].x>=(2*frameWidth/3)){
+                rectangle(frame,hands[i],cv::Scalar(0,0,255),2);
+               // std::cout <<"x_d:"<< hands[i].x<<" y_d:"<< hands[i].y<<std::endl;
+
+                // Add the Right hand coordinants to the list
+                cv::Point p;
+                p.x = hands[i].x;
+                p.y = hands[i].y;
+                RightPositions.push_back(p);
+            }
+
+
+            // check if the hand is in the center box of the screen
+            if ((hands[i].x>(frameWidth/3 - hands[i].width )) && (hands[i].x < (2*frameWidth/3))
+                  && (hands[i].y>(frameHeight/3))  && (hands[i].y <(2*frameHeight/3))
+                    && (int)hands.size()==2
+                    ){
+                rectangle(frame,hands[i],cv::Scalar(255,0,0),2);
+                std::cout <<(int)hands.size() << "  stop"<<std::endl;
+
+                if(barrel->CarInStopZone(car)){
+                    m_AnimationTimer->stop();
+                    activateMove = false;
+                }
+                stop = true;
+            }else{
+                stop = false;
+            }
+        }
+    }
+
+        if (!(LeftPositions.empty()) && !(RightPositions.empty())){
+            RotationCheck();
+        }
+
+    // Display frame
+    imshow("WebCam", frame);
+
+
+
+
+
+    /* opengl part */
     QPainter painter(this);
     painter.beginNativePainting();
 
@@ -127,7 +225,7 @@ void MKWidget::paintEvent(QPaintEvent *){
     glLoadIdentity();
 
     // Set camera
-             //camX camY camZ targetX targetY targetZ vecX vecY vecZ.
+    //camX camY camZ targetX targetY targetZ vecX vecY vecZ.
     gluLookAt(CAM_POS[0], CAM_POS[1], CAM_POS[2],0.,0.,0.,0.,1.,0.);
     //gluLookAt(0., 150., 0.,0.,0.,0.,0.,1.,0.);
 
@@ -159,7 +257,7 @@ void MKWidget::paintEvent(QPaintEvent *){
     PrintTimer();
 
     if (pause){
-       PrintPause();
+        PrintPause();
     }
 
 }
@@ -176,41 +274,41 @@ void MKWidget::keyPressEvent(QKeyEvent * event)
 
     switch(event->key())
     {
-        /* Move car to left side, and make sure car does not get out of the road. */
-        case Qt::Key_Left:
-              left_right = left_right - carWidth / 2 > - roadWidth / 2 && activateMove ? left_right - 2. : left_right;
-              car->setPosition(new float[3] { left_right, 0., 0. });
-              degree = activateMove ? 3 : degree;
-              break;
+    /* Move car to left side, and make sure car does not get out of the road. */
+    case Qt::Key_Left:
+        left_right = left_right - carWidth / 2 > - roadWidth / 2 && activateMove ? left_right - 2. : left_right;
+        car->setPosition(new float[3] { left_right, 0., 0. });
+        degree = activateMove ? 3 : degree;
+        break;
 
         /* Move car to right side, and make sure car does not get out of the road. */
-        case Qt::Key_Right:
-              left_right = left_right + carWidth / 2 < roadWidth / 2 && activateMove ? left_right + 2. : left_right;
-              car->setPosition(new float[3] { left_right, 0., 0. });
-              degree  = activateMove ? -3 : degree;
-              break;
+    case Qt::Key_Right:
+        left_right = left_right + carWidth / 2 < roadWidth / 2 && activateMove ? left_right + 2. : left_right;
+        car->setPosition(new float[3] { left_right, 0., 0. });
+        degree  = activateMove ? -3 : degree;
+        break;
 
-        case Qt::Key_P:
+    case Qt::Key_P:
 
-            if(barrel->CarInStopZone(car)){
-                StopAnimation();
-            }else{
-                pause = true;
-                StopAnimation();
-            }
+        if(barrel->CarInStopZone(car)){
+            StopAnimation();
+        }else{
+            pause = true;
+            StopAnimation();
+        }
 
-            break;
+        break;
 
-        case Qt::Key_Q:
-              exit(0);
+    case Qt::Key_Q:
+        exit(0);
 
         /* Default case. */
-        default:
-        {
-            /* Ignore event. */
-            event->ignore();
-            return;
-        }
+    default:
+    {
+        /* Ignore event. */
+        event->ignore();
+        return;
+    }
     }
 
     /* Accept event and update scene */
@@ -283,6 +381,8 @@ void MKWidget::mousePressEvent(QMouseEvent *event)
         hits = glRenderMode(GL_RENDER);
         if (hits == 1){
             m_barrelPressed = true;
+            activateMove = true;
+            m_AnimationTimer->start();
             fuelBar->Fill(!(pause));
             event->accept();
             update();
@@ -315,30 +415,30 @@ void MKWidget::DisplayMainCar() {
  */
 void MKWidget::GenerateCar(unsigned int i, bool init) {
 
-        GLfloat * color = new GLfloat[3] { static_cast <float> (rand()) / static_cast <float> (RAND_MAX), static_cast <float> (rand()) / static_cast <float> (RAND_MAX), static_cast <float> (rand()) / static_cast <float> (RAND_MAX) };
+    GLfloat * color = new GLfloat[3] { static_cast <float> (rand()) / static_cast <float> (RAND_MAX), static_cast <float> (rand()) / static_cast <float> (RAND_MAX), static_cast <float> (rand()) / static_cast <float> (RAND_MAX) };
 
-        /* Get random percent of the road (0% left side of the road; 10% right side of the road). */
-        float percentOfXRoad = (std::rand() % 100 + 1) / 100.;
+    /* Get random percent of the road (0% left side of the road; 10% right side of the road). */
+    float percentOfXRoad = (std::rand() % 100 + 1) / 100.;
 
-        GLfloat * scopeRoad = new GLfloat[2] { (car->GetWidth() - ground->GetRoadWidth())/2, (ground->GetRoadWidth() - car->GetWidth())/2};
+    GLfloat * scopeRoad = new GLfloat[2] { (car->GetWidth() - ground->GetRoadWidth())/2, (ground->GetRoadWidth() - car->GetWidth())/2};
 
-        /* Set the opposite car position. */
-        float * pos = new float[3];
-        pos[0] = scopeRoad[0] + percentOfXRoad * (scopeRoad[1] - scopeRoad[0]);
-        pos[1] = 1.;
-        distBetOppCars = (ground->GetRoadHeight() + CAM_POS[2]) * (i + 1 + NB_OPPOSITE_CARS)/NB_OPPOSITE_CARS;
-        /* If initialisation of game, generate other car further */
-        pos[2] = !init ? ground->GetRoadHeight() : distBetOppCars;
+    /* Set the opposite car position. */
+    float * pos = new float[3];
+    pos[0] = scopeRoad[0] + percentOfXRoad * (scopeRoad[1] - scopeRoad[0]);
+    pos[1] = 1.;
+    distBetOppCars = (ground->GetRoadHeight() + CAM_POS[2]) * (i + 1 + NB_OPPOSITE_CARS)/NB_OPPOSITE_CARS;
+    /* If initialisation of game, generate other car further */
+    pos[2] = !init ? ground->GetRoadHeight() : distBetOppCars;
 
-        /* Create opposite car and set position. */
-        Car * oppositeCar = new Car(color);
-        oppositeCar->setPosition(pos);
+    /* Create opposite car and set position. */
+    Car * oppositeCar = new Car(color);
+    oppositeCar->setPosition(pos);
 
-        /* Fill array. */
-        *(oppositeCars + i) = oppositeCar;
+    /* Fill array. */
+    *(oppositeCars + i) = oppositeCar;
 
-        /* If a new car was generated and it was not an initialization of the scene, then increase score. */
-        score = init ? score : score + 1;
+    /* If a new car was generated and it was not an initialization of the scene, then increase score. */
+    score = init ? score : score + 1;
 }
 
 
@@ -393,15 +493,15 @@ void MKWidget::CheckCollison() {
         /* Check for collisions with main car. */
         if (
                 ((-oppPos[2] - oppositeCars[i]->GetHeight() >= zCarPos - car->GetHeight()/2
-                 && -oppPos[2] - oppositeCars[i]->GetHeight() <= zCarPos + car->GetHeight()/2.)
+                  && -oppPos[2] - oppositeCars[i]->GetHeight() <= zCarPos + car->GetHeight()/2.)
                  || (-oppPos[2] + oppositeCars[i]->GetHeight() >= zCarPos - car->GetHeight()/2
-                 && -oppPos[2] + oppositeCars[i]->GetHeight() <= zCarPos + car->GetHeight()/2))
+                     && -oppPos[2] + oppositeCars[i]->GetHeight() <= zCarPos + car->GetHeight()/2))
                 && ((oppPos[0] <= xCarPos
-                 && oppPos[0] + oppositeCars[i]->GetWidth() > xCarPos)
-                 ||( oppPos[0] < xCarPos + car->GetWidth()
-                 && oppPos[0] + oppositeCars[i]->GetWidth() >= xCarPos + car->GetWidth()))
-            ) {
-                exit(0);
+                     && oppPos[0] + oppositeCars[i]->GetWidth() > xCarPos)
+                    ||( oppPos[0] < xCarPos + car->GetWidth()
+                        && oppPos[0] + oppositeCars[i]->GetWidth() >= xCarPos + car->GetWidth()))
+                ) {
+            exit(0);
         }
     }
 }
@@ -438,7 +538,10 @@ void MKWidget::PrintPause()
     QPainter painter(this);
 
     painter.setRenderHint(QPainter::Antialiasing);
-    painter.setPen(Qt::black);
+    painter.setBrush(Qt::gray);
+    QRectF rectangle(width() / 4, height()/3, width()/2, height()/3);
+    painter.drawRoundedRect(rectangle, 20.0, 15.0);
+    painter.setPen(Qt::white);
 
     QFont font("Monospace", 70);
     painter.setFont(font);
@@ -446,7 +549,7 @@ void MKWidget::PrintPause()
 
     QFont font2("Monospace", 15);
     painter.setFont(font2);
-    painter.drawText(width() / 3, 2*height() /3, QString("Press P to resume"));
+    painter.drawText(width() / 3, 3*height() /5, QString("Press P to resume"));
     painter.end();
 }
 
@@ -458,8 +561,8 @@ void MKWidget::PrintPause()
 void MKWidget::StopAnimation(){
     if(m_AnimationTimer->isActive())
     {
-          m_AnimationTimer->stop();
-          activateMove = false; 
+        m_AnimationTimer->stop();
+        activateMove = false;
     }
     else
     {
@@ -470,6 +573,62 @@ void MKWidget::StopAnimation(){
 
 }
 
+
+/**
+ * turn to the left or right based on hand positions
+ */
+void MKWidget::RotationCheck(){
+    const float carWidth = car->GetWidth();
+    const float roadWidth = ground->GetRoadWidth();
+
+    // get last detected elements
+    cv::Point LeftPosition = LeftPositions.back();
+    cv::Point RightPosition = RightPositions.back();
+
+    // turn left
+    if ((LeftPosition.y - RightPosition.y) > error){
+
+        // Move to the left
+        left_right = left_right - carWidth / 2 > - roadWidth / 2 && activateMove ? left_right - 2. : left_right;
+        car->setPosition(new float[3] { left_right, 0., 0. });
+        degree = activateMove ? 3 : degree;
+
+        // remove the point
+        LeftPositions.pop_back();
+        RightPositions.pop_back();
+
+        std::cout << left_right << "  Turn left "<<std::endl;
+
+    }
+
+    // turn right
+    if ((RightPosition.y - LeftPosition.y) > error){
+
+        // Move to the right
+        left_right = left_right + carWidth / 2 < roadWidth / 2 && activateMove ? left_right + 2. : left_right;
+        car->setPosition(new float[3] { left_right, 0., 0. });
+        degree  = activateMove ? -3 : degree;
+
+        // remove the point
+        LeftPositions.pop_back();
+        RightPositions.pop_back();
+
+        std::cout << left_right << "  Turn right "<<std::endl;
+
+    }
+
+}
+
+
+/**
+ * draw delimitations on the camera
+ */
+void MKWidget::DrawZonePos(cv::Mat frame){
+    line( frame, cv::Point( frameWidth/3, 0), cv::Point(frameWidth/3, frameHeight), cv::Scalar(0,255,0), 2, cv::LINE_8 );
+    line( frame, cv::Point( 2*frameWidth/3, 0), cv::Point(2*frameWidth/3, frameHeight), cv::Scalar(0,0,255), 2, cv::LINE_8 );
+    rectangle( frame, cv::Point( frameWidth/3, frameHeight/3),cv::Point( 2*frameWidth/3, 2*frameHeight/3),cv::Scalar( 255, 0, 0),2,cv::LINE_8 );
+
+}
 
 
 
