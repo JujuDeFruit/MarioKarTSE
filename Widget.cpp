@@ -130,86 +130,9 @@ void MKWidget::resizeGL(int width, int height)
  */
 
 void MKWidget::paintEvent(QPaintEvent *){
-    degree = 0;
-    Mat frame,frame_gray;
-    std::vector<Rect> hands;
-    // Get frame
-    cap >> frame;
-    // Mirror effect
-    cv::flip(frame,frame,1);
-    // Convert to gray
-    cv::cvtColor(frame,frame_gray,COLOR_BGR2GRAY);
-    // Equalize graylevels
-    //        equalizeHist( frame_gray, frame_gray );
 
-
-    //-- Detect hands
-    hand_cascade.detectMultiScale( frame_gray, hands, 1.1, 4, 0, Size(60, 60) );
-
-
-    DrawZonePos(frame);
-
-
-    if (hands.size()>0 && hands.size()<3 ){  // limit to 2 hands
-
-        // Draw green rectangle
-        for (int i=0;i<(int)hands.size();i++){
-
-            // check if hand on the left side of screen
-            if (hands[i].x<= (frameWidth/3 - hands[i].width) ){
-                rectangle(frame,hands[i],cv::Scalar(0,255,0),2);
-               // std::cout <<"x_g:"<< hands[i].x<<" y_g:"<< hands[i].y<<std::endl;
-
-                // Add the left hand coordinants to the list
-                cv::Point p;
-                p.x = hands[i].x;
-                p.y = hands[i].y;
-                LeftPositions.push_back(p);
-            }
-
-            // check if hand on the right side of the screen
-            if (hands[i].x>=(2*frameWidth/3)){
-                rectangle(frame,hands[i],cv::Scalar(0,0,255),2);
-               // std::cout <<"x_d:"<< hands[i].x<<" y_d:"<< hands[i].y<<std::endl;
-
-                // Add the Right hand coordinants to the list
-                cv::Point p;
-                p.x = hands[i].x;
-                p.y = hands[i].y;
-                RightPositions.push_back(p);
-            }
-
-
-            // check if the hand is in the center box of the screen
-            if ((hands[i].x>(frameWidth/3 - hands[i].width )) && (hands[i].x < (2*frameWidth/3))
-                  && (hands[i].y>(frameHeight/3))  && (hands[i].y <(2*frameHeight/3))
-                    && (int)hands.size()==2
-                    ){
-                rectangle(frame,hands[i],cv::Scalar(255,0,0),2);
-                std::cout <<(int)hands.size() << "  stop"<<std::endl;
-
-                if(barrel->CarInStopZone(car)){
-                    m_AnimationTimer->stop();
-                    activateMove = false;
-                }
-                stop = true;
-            }else{
-                stop = false;
-            }
-        }
-    }
-
-        if (!(LeftPositions.empty()) && !(RightPositions.empty())){
-            RotationCheck();
-        }
-
-
-    // Display frame
-    imshow("WebCam", frame);
-
-
-
-
+    /*Camera part */
+    Camera();
 
     /* opengl part */
     QPainter painter(this);
@@ -628,9 +551,102 @@ void MKWidget::RotationCheck(){
  * draw delimitations on the camera
  */
 void MKWidget::DrawZonePos(cv::Mat frame){
-    line( frame, cv::Point( frameWidth/3, 0), cv::Point(frameWidth/3, frameHeight), cv::Scalar(0,255,0), 2, cv::LINE_8 );
-    line( frame, cv::Point( 2*frameWidth/3, 0), cv::Point(2*frameWidth/3, frameHeight), cv::Scalar(0,0,255), 2, cv::LINE_8 );
+//    line( frame, cv::Point( frameWidth/3, 0), cv::Point(frameWidth/3, frameHeight), cv::Scalar(0,255,0), 2, cv::LINE_8 );
+//    line( frame, cv::Point( 2*frameWidth/3, 0), cv::Point(2*frameWidth/3, frameHeight), cv::Scalar(0,0,255), 2, cv::LINE_8 );
     rectangle( frame, cv::Point( frameWidth/3, frameHeight/3),cv::Point( 2*frameWidth/3, 2*frameHeight/3),cv::Scalar( 255, 0, 0),2,cv::LINE_8 );
+
+    putText(frame, "Place your left", cv::Point(5,30), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cv::Scalar(0,0,0), 1);
+    putText(frame, "hand on this side", cv::Point(5,50), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cv::Scalar(0,0,0), 1);
+
+    putText(frame, "Place your right", cv::Point(2*frameWidth/3 +5,30), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cv::Scalar(0,0,0), 1);
+    putText(frame, "hand on this side", cv::Point(2*frameWidth/3 +5,50), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cv::Scalar(0,0,0), 1);
+
+    putText(frame, "Place both your hands", cv::Point(frameWidth/3-5,frameHeight/4), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cv::Scalar(0,0,0), 1);
+    putText(frame, "inside the box to brake", cv::Point(frameWidth/3-5,frameHeight/4+20), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cv::Scalar(0,0,0), 1);
+
+}
+
+
+/**
+ * display webcam
+ */
+void MKWidget::Camera(){
+    degree = 0;
+    Mat frame,frame_gray;
+    std::vector<Rect> hands;
+    // Get frame
+    cap >> frame;
+    // Mirror effect
+    cv::flip(frame,frame,1);
+    // Convert to gray
+    cv::cvtColor(frame,frame_gray,COLOR_BGR2GRAY);
+    // Equalize graylevels
+    //        equalizeHist( frame_gray, frame_gray );
+
+
+    //-- Detect hands
+    hand_cascade.detectMultiScale( frame_gray, hands, 1.1, 4, 0, Size(60, 60) );
+
+
+    DrawZonePos(frame);
+
+
+    if (hands.size()>0 && hands.size()<3 ){  // limit to 2 hands
+
+        // Draw green rectangle
+        for (int i=0;i<(int)hands.size();i++){
+
+            // check if hand on the left side of screen
+            if (hands[i].x<= (frameWidth/3 - hands[i].width) ){
+                rectangle(frame,hands[i],cv::Scalar(0,255,0),2);
+               // std::cout <<"x_g:"<< hands[i].x<<" y_g:"<< hands[i].y<<std::endl;
+
+                // Add the left hand coordinants to the list
+                cv::Point p;
+                p.x = hands[i].x;
+                p.y = hands[i].y;
+                LeftPositions.push_back(p);
+            }
+
+            // check if hand on the right side of the screen
+            if (hands[i].x>=(2*frameWidth/3)){
+                rectangle(frame,hands[i],cv::Scalar(0,0,255),2);
+               // std::cout <<"x_d:"<< hands[i].x<<" y_d:"<< hands[i].y<<std::endl;
+
+                // Add the Right hand coordinants to the list
+                cv::Point p;
+                p.x = hands[i].x;
+                p.y = hands[i].y;
+                RightPositions.push_back(p);
+            }
+
+
+            // check if the hand is in the center box of the screen
+            if ((hands[i].x>(frameWidth/3 - hands[i].width )) && (hands[i].x < (2*frameWidth/3))
+                  && (hands[i].y>(frameHeight/3))  && (hands[i].y <(2*frameHeight/3))
+                    && (int)hands.size()==2
+                    ){
+                rectangle(frame,hands[i],cv::Scalar(255,0,0),2);
+                std::cout <<(int)hands.size() << "  stop"<<std::endl;
+
+                if(barrel->CarInStopZone(car)){
+                    m_AnimationTimer->stop();
+                    activateMove = false;
+                }
+                stop = true;
+            }else{
+                stop = false;
+            }
+        }
+    }
+
+        if (!(LeftPositions.empty()) && !(RightPositions.empty())){
+            RotationCheck();
+        }
+
+
+    // Display frame
+    imshow("WebCam", frame);
 
 }
 

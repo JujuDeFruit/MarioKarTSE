@@ -121,6 +121,7 @@ private:
     void StopAnimation();
     void PrintPause();
 
+    void Camera();
     void RotationCheck();
     void DrawZonePos(cv::Mat);
 
