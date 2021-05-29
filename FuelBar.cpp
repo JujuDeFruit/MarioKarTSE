@@ -40,10 +40,10 @@ void FuelBar::Display() {
     else if (value < 60. && value >= 30.) {glColor3f(1, 1, 0.1);}
     else{glColor3f(1, 0.1, 0.1);}
 
-    glVertex3f(XYZ[0] - 2.5, XYZ[1] + 1.5, XYZ[2] - 10);
-    glVertex3f(x, XYZ[1] + 1.5, XYZ[2] - 10);
-    glVertex3f(x, XYZ[1] + 1., XYZ[2] - 10);
-    glVertex3f(XYZ[0] - 2.5, XYZ[1] + 1., XYZ[2] - 10);
+    glVertex3f(xyz[0] - 2.5, xyz[1] + 1.5, xyz[2] - 10);
+    glVertex3f(x, xyz[1] + 1.5, xyz[2] - 10);
+    glVertex3f(x, xyz[1] + 1., xyz[2] - 10);
+    glVertex3f(xyz[0] - 2.5, xyz[1] + 1., xyz[2] - 10);
     glEnd();
     glPopMatrix();
 
@@ -54,10 +54,10 @@ void FuelBar::Display() {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glColor3f(0.1, 0.1, 0.1);
-    glVertex3f(XYZ[0] - 2.5, XYZ[1] + 1.5, XYZ[2] - 10);
-    glVertex3f(5 * (float)MAX/MAX - 2.5, XYZ[1] + 1.5, XYZ[2] - 10);
-    glVertex3f(5 * (float)MAX/MAX - 2.5, XYZ[1] + 1., XYZ[2] - 10);
-    glVertex3f(XYZ[0] - 2.5, XYZ[1] + 1., XYZ[2] - 10);
+    glVertex3f(xyz[0] - 2.5, xyz[1] + 1.5, xyz[2] - 10);
+    glVertex3f(5 * (float)MAX/MAX - 2.5, xyz[1] + 1.5, xyz[2] - 10);
+    glVertex3f(5 * (float)MAX/MAX - 2.5, xyz[1] + 1., xyz[2] - 10);
+    glVertex3f(xyz[0] - 2.5, xyz[1] + 1., xyz[2] - 10);
     glEnd();
     glPopMatrix();
 

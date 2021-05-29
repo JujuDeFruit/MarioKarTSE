@@ -17,6 +17,7 @@ Car::Car(GLfloat * color_){
  * Display and refresh car on the screen.
  *
  * @param iTimeElapsed : timer to synchronize displaying.
+ * @param activGiro : display gyro on car when true
  */
 void Car::Display(uint64_t iTimeElapsed, bool activGiro) {
     glPushMatrix();

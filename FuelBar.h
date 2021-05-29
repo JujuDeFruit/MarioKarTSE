@@ -10,16 +10,16 @@
  *
  * @param value : current value (0 - 100) of available fuel in the car.
  * @param MAX : const to maximize fuelbar.
- * @param XYZ : array of current coordonates of the camera wathing scene.
+ * @param xyz : array of current coordonates of the camera wathing scene.
  */
 class FuelBar {
 private:
     float value;
     const float MAX = 100.;
-    float * XYZ;
+    float * xyz;
 public:
     /* Constructor */
-    FuelBar(float * CAM_POS) { value = MAX; XYZ = CAM_POS; };
+    FuelBar(float * CAM_POS) { value = MAX; xyz = CAM_POS; };
 
     /* Methods */
     void Decrease(float v);

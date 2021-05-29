@@ -28,6 +28,7 @@ Barrel::Barrel(){
  */
 Barrel::~Barrel(){
     delete [] textureID;
+    delete stopZone;
 }
 
 
@@ -100,7 +101,7 @@ void Barrel::Display( Ground * ground,  bool barrelPressed, bool activateMove, b
         glPopMatrix();
 
         float * position = new float[3] { xPos, 5.0f, zPos};
-        stopZone->setPosition(position);
+        stopZone->SetPosition(position);
         stopZone->Display();
 
         gluDeleteQuadric(quadrique);     // Remove barrel when out of frame
