@@ -79,6 +79,8 @@ private:
     bool activateMove = true;
     bool pause = false;
 
+    bool gameOver = false;
+
     int score = 0;
     QElapsedTimer * timer;
 
@@ -120,6 +122,7 @@ private:
     void PrintTimer();
     void StopAnimation();
     void PrintPause();
+    void PrintGameOver();
 
     void Camera();
     void RotationCheck();

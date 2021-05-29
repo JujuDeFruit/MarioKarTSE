@@ -216,14 +216,8 @@ void MKWidget::keyPressEvent(QKeyEvent * event)
         break;
 
     case Qt::Key_P:
-
-        if(barrel->CarInStopZone(car)){
-            StopAnimation();
-        }else{
-            pause = true;
-            StopAnimation();
-        }
-
+        pause = true;
+        StopAnimation();
         break;
 
     case Qt::Key_Q:
@@ -428,7 +422,9 @@ void MKWidget::CheckCollison() {
                     ||( oppPos[0] < xCarPos + car->GetWidth()
                         && oppPos[0] + oppositeCars[i]->GetWidth() >= xCarPos + car->GetWidth()))
                 ) {
-            exit(0);
+//            exit(0);
+            PrintGameOver();
+            StopAnimation();
         }
     }
 }
@@ -477,6 +473,31 @@ void MKWidget::PrintPause()
     QFont font2("Monospace", 15);
     painter.setFont(font2);
     painter.drawText(width() / 3, 3*height() /5, QString("Press P to resume"));
+    painter.end();
+}
+
+/**
+ * @brief MKWidget::PrintGameOver
+ * Print game over on screen.
+ */
+void MKWidget::PrintGameOver()
+{
+    QPainter painter(this);
+
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setBrush(Qt::gray);
+    QRectF rectangle(width() / 4, height()/3, width()/2, height()/3);
+    painter.drawRoundedRect(rectangle, 20.0, 15.0);
+    painter.setPen(Qt::red);
+
+    QFont font("Monospace", 50);
+    painter.setFont(font);
+    painter.drawText(width() / 3, height() / 2, QString("Game over"));
+
+    QFont font2("Monospace", 15);
+    painter.setPen(Qt::white);
+    painter.setFont(font2);
+    painter.drawText(width() / 3, 3*height() /5, QString("Press R to resume"));
     painter.end();
 }
 
@@ -561,8 +582,9 @@ void MKWidget::DrawZonePos(cv::Mat frame){
     putText(frame, "Place your right", cv::Point(2*frameWidth/3 +5,30), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cv::Scalar(0,0,0), 1);
     putText(frame, "hand on this side", cv::Point(2*frameWidth/3 +5,50), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cv::Scalar(0,0,0), 1);
 
-    putText(frame, "Place both your hands", cv::Point(frameWidth/3-5,frameHeight/4), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cv::Scalar(0,0,0), 1);
-    putText(frame, "inside the box to brake", cv::Point(frameWidth/3-5,frameHeight/4+20), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cv::Scalar(0,0,0), 1);
+    putText(frame, "Place both your hands", cv::Point(frameWidth/3-5,frameHeight/4-20), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cv::Scalar(0,0,0), 1);
+    putText(frame, "inside the box while in", cv::Point(frameWidth/3-5,frameHeight/4), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cv::Scalar(0,0,0), 1);
+    putText(frame, "a stop zone to brake", cv::Point(frameWidth/3-5,frameHeight/4+20), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cv::Scalar(0,0,0), 1);
 
 }
 
@@ -571,7 +593,7 @@ void MKWidget::DrawZonePos(cv::Mat frame){
  * display webcam
  */
 void MKWidget::Camera(){
-    degree = 0;
+
     Mat frame,frame_gray;
     std::vector<Rect> hands;
     // Get frame
@@ -633,16 +655,14 @@ void MKWidget::Camera(){
                     m_AnimationTimer->stop();
                     activateMove = false;
                 }
-                stop = true;
-            }else{
-                stop = false;
-            }
+
         }
     }
 
         if (!(LeftPositions.empty()) && !(RightPositions.empty())){
             RotationCheck();
         }
+        else{degree = 0;}
 
 
     // Display frame
@@ -651,4 +671,4 @@ void MKWidget::Camera(){
 }
 
 
-
+}
