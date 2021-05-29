@@ -742,8 +742,9 @@ void MKWidget::Camera(){
 //                std::cout <<(int)hands.size() << "  stop"<<std::endl;
 
                 if(barrel->CarInStopZone(car)){
+                    degree = 0;
                     m_AnimationTimer->stop();
-                    activateMove = false;
+                    activateMove = false;            
                 }
 
         }
@@ -752,13 +753,12 @@ void MKWidget::Camera(){
         if (!(leftPositions.empty()) && !(rightPositions.empty())){
             RotationCheck();
         }
-        else{degree = 0;}
+
 
 
     // Display frame
     imshow("WebCam", frame);
 
-}
-
+}else{degree = 0;}
 
 }
