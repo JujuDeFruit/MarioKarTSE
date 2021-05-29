@@ -78,6 +78,6 @@ void StopZone::Display()
  */
 float * StopZone::GetXRange() const {
     float xBegin = position[0] > 0 ? position[0] - 3 : position[0] + 3;
-    float xEnd = position[0] > 0 ? position[0] - 1 - 2 * width / 3 : position[0] + 1 + 2 * width / 3;
+    float xEnd = position[0] > 0 ? position[0] - 1 - 2 * WIDTH / 3 : position[0] + 1 + 2 * WIDTH / 3;
     return new float[2] {xBegin, xEnd};
 }
