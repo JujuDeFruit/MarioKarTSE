@@ -68,6 +68,22 @@ MKWidget::MKWidget(QOpenGLWidget * parent):QOpenGLWidget(parent)
 
 
 /**
+ * @brief MKWidget::~MKWidget
+ * Destructor
+ */
+MKWidget::~MKWidget() {
+    delete m_AnimationTimer;
+    delete zone;
+    delete ground;
+    delete barrel;
+    delete fuelBar;
+    delete car;
+    delete oppositeCars;
+    delete timer;
+}
+
+
+/**
  * Refresh the window
  */
 void MKWidget::Refresh(){

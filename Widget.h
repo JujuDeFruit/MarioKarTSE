@@ -128,6 +128,9 @@ private:
     void RotationCheck();
     void DrawZonePos(Mat);
 
+    /* Destructor */
+    ~MKWidget();
+
 private slots:
     void Refresh();
 
