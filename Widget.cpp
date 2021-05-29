@@ -54,12 +54,14 @@ MKWidget::MKWidget(QOpenGLWidget * parent):QOpenGLWidget(parent)
     if(!cap.isOpened())  // check if we succeeded
     {
         std::cerr<<"Error openning the default camera"<<std::endl;
+        exit(0);
     }
 
 
-    if( !hand_cascade.load( "C:/Users/COMPAQ/Desktop/pro/TestDetectMultiScale/fist3.xml" ) )
+    if( !hand_cascade.load( "C:/Users/COMPAQ/Desktop/Mario/mario-kartse/res/fist3.xml" ) )
     {
         std::cerr<<"Error loading haarcascade"<<std::endl;
+        exit(0);
     }
     // Init output window
     namedWindow("WebCam",1);
@@ -128,6 +130,7 @@ void MKWidget::resizeGL(int width, int height)
  */
 
 void MKWidget::paintEvent(QPaintEvent *){
+    degree = 0;
     Mat frame,frame_gray;
     std::vector<Rect> hands;
     // Get frame
@@ -199,6 +202,7 @@ void MKWidget::paintEvent(QPaintEvent *){
         if (!(LeftPositions.empty()) && !(RightPositions.empty())){
             RotationCheck();
         }
+
 
     // Display frame
     imshow("WebCam", frame);
@@ -614,8 +618,8 @@ void MKWidget::RotationCheck(){
         RightPositions.pop_back();
 
         std::cout << left_right << "  Turn right "<<std::endl;
-
     }
+
 
 }
 
