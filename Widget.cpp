@@ -186,6 +186,11 @@ void MKWidget::paintEvent(QPaintEvent *){
     if (pause){
         PrintPause();
     }
+    if (gameOver){
+        PrintGameOver();
+        StopAnimation();
+    }
+
 
 }
 
@@ -222,6 +227,11 @@ void MKWidget::keyPressEvent(QKeyEvent * event)
 
     case Qt::Key_Q:
         exit(0);
+
+    case Qt::Key_R:
+        gameOver = false;
+        StopAnimation();
+        break;
 
         /* Default case. */
     default:
@@ -413,18 +423,17 @@ void MKWidget::CheckCollison() {
 
         /* Check for collisions with main car. */
         if (
-                ((-oppPos[2] - oppositeCars[i]->GetHeight() >= zCarPos - car->GetHeight()/2
-                  && -oppPos[2] - oppositeCars[i]->GetHeight() <= zCarPos + car->GetHeight()/2.)
-                 || (-oppPos[2] + oppositeCars[i]->GetHeight() >= zCarPos - car->GetHeight()/2
-                     && -oppPos[2] + oppositeCars[i]->GetHeight() <= zCarPos + car->GetHeight()/2))
-                && ((oppPos[0] <= xCarPos
-                     && oppPos[0] + oppositeCars[i]->GetWidth() > xCarPos)
-                    ||( oppPos[0] < xCarPos + car->GetWidth()
-                        && oppPos[0] + oppositeCars[i]->GetWidth() >= xCarPos + car->GetWidth()))
-                ) {
-//            exit(0);
-            PrintGameOver();
-            StopAnimation();
+            ((-oppPos[2] - oppositeCars[i]->GetHeight() >= zCarPos - car->GetHeight()/2
+              && -oppPos[2] - oppositeCars[i]->GetHeight() <= zCarPos + car->GetHeight()/2.)
+             || (-oppPos[2] + oppositeCars[i]->GetHeight() >= zCarPos - car->GetHeight()/2
+                 && -oppPos[2] + oppositeCars[i]->GetHeight() <= zCarPos + car->GetHeight()/2))
+            && ((oppPos[0] <= xCarPos
+                 && oppPos[0] + oppositeCars[i]->GetWidth() > xCarPos)
+                ||( oppPos[0] < xCarPos + car->GetWidth()
+                    && oppPos[0] + oppositeCars[i]->GetWidth() >= xCarPos + car->GetWidth()))
+            ) {
+//          exit(0);
+            gameOver = true;
         }
     }
 }
@@ -545,7 +554,7 @@ void MKWidget::RotationCheck(){
         LeftPositions.pop_back();
         RightPositions.pop_back();
 
-        std::cout << left_right << "  Turn left "<<std::endl;
+//        std::cout << left_right << "  Turn left "<<std::endl;
 
     }
 
@@ -561,7 +570,7 @@ void MKWidget::RotationCheck(){
         LeftPositions.pop_back();
         RightPositions.pop_back();
 
-        std::cout << left_right << "  Turn right "<<std::endl;
+//        std::cout << left_right << "  Turn right "<<std::endl;
     }
 
 
@@ -649,7 +658,7 @@ void MKWidget::Camera(){
                     && (int)hands.size()==2
                     ){
                 rectangle(frame,hands[i],cv::Scalar(255,0,0),2);
-                std::cout <<(int)hands.size() << "  stop"<<std::endl;
+//                std::cout <<(int)hands.size() << "  stop"<<std::endl;
 
                 if(barrel->CarInStopZone(car)){
                     m_AnimationTimer->stop();

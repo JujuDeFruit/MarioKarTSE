@@ -55,6 +55,8 @@ void Barrel::LoadTextures() {
  * @param iTimeElapsed : timer
  * @param ground : Ground pointer
  * @param barrelPressed : is the barrel pressed by user ?
+ * @param activateMove : stop refreshing if the timer is stoped
+ * @param pause : prevent barrel from being clicked if the game is paused
  */
 void Barrel::Display( Ground * ground,  bool barrelPressed, bool activateMove, bool pause) {
 
@@ -142,7 +144,6 @@ void Barrel::DrawBarrel(GLUquadric * quadrique){
 /**
  * @brief drawStopZone
  * Draw area to stop car and fill the car.
- * @param xPos : x position of the barrel.
  */
 void Barrel::DrawArea() {
 
@@ -160,6 +161,11 @@ void Barrel::DrawArea() {
 }
 
 
+/**
+ * @brief CarInStopZone
+ * check if car is in a stop zone.
+ * @param car :car object
+ */
 
 bool Barrel::CarInStopZone(Car * car) {
 
