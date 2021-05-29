@@ -142,6 +142,8 @@ void MKWidget::resizeGL(int width, int height)
 
 /**
  * Overriding paintEvent printing method.
+ *
+ * @param QPaintEvent : paint event
  */
 void MKWidget::paintEvent(QPaintEvent *)
 {
@@ -631,8 +633,6 @@ void MKWidget::RotationCheck(){
  * @param frame : matrix containning frame infos to draw
  */
 void MKWidget::DrawZonePos(Mat frame){
-//    line( frame, Point( frameWidth/3, 0), Point(frameWidth/3, frameHeight), Scalar(0,255,0), 2, LINE_8 );
-//    line( frame, Point( 2*frameWidth/3, 0), Point(2*frameWidth/3, frameHeight), Scalar(0,0,255), 2, LINE_8 );
     rectangle( frame, Point( frameWidth/3, frameHeight/3),Point( 2*frameWidth/3, 2*frameHeight/3),Scalar( 255, 0, 0),2,LINE_8 );
 
     putText(frame, "Place your left", Point(5,30), FONT_HERSHEY_COMPLEX_SMALL, 0.8, Scalar(0,0,0), 1);
@@ -648,7 +648,7 @@ void MKWidget::DrawZonePos(Mat frame){
 
 
 /**
- * display webcam
+ * Display webcam
  */
 void MKWidget::Camera(){
     degree = 0;

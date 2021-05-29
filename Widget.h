@@ -105,7 +105,9 @@ private:
 
 public:
     /* Constructor */
-    MKWidget(QOpenGLWidget * parent = nullptr);
+    MKWidget(QOpenGLWidget * = nullptr);
+    /* Destructor */
+    ~MKWidget();
 
 private:
     /* Herited methods from QOpenGLWidget. Overrided methods */
@@ -127,9 +129,6 @@ private:
     void Camera();
     void RotationCheck();
     void DrawZonePos(Mat);
-
-    /* Destructor */
-    ~MKWidget();
 
 private slots:
     void Refresh();
