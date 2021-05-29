@@ -48,6 +48,14 @@ using namespace std;
  * @param distBetOppCars : distance between 2 opposite cars.
  * @param m_barrelPressed : check if barrel is clicked or not.
  * @param score : score of the player. Score is increased by 1 for each exceeded opposite car.
+ * @param cap : Default video capture.
+ * @param hand_cascade : Cascade containning values trained to detect hands.
+ * @param frameWidth : Frame width.
+ * @param frameHeight : Frame height.
+ * @param stop : stop animation bool.
+ * @param rightPositions : current right hand positions (vector of points).
+ * @param leftPositions : current left hand positions (vector of points).
+ * @param error : detection sensibility
  */
 class MKWidget : public QOpenGLWidget
 {
@@ -90,23 +98,19 @@ private:
     bool stop = false;
 
 
-    std::vector<cv::Point> LeftPositions;
-    std::vector<cv::Point> RightPositions;
+    vector<Point> leftPositions;
+    vector<Point> rightPositions;
 
     double error = 30;
-
 
 public:
     /* Constructor */
     MKWidget(QOpenGLWidget * parent = nullptr);
 
-
-
 private:
     /* Herited methods from QOpenGLWidget. Overrided methods */
     virtual void initializeGL();
     virtual void resizeGL(int, int);
-  //  virtual void paintGL();
     virtual void keyPressEvent(QKeyEvent* event);
     virtual void keyReleaseEvent(QKeyEvent* event);
     virtual void mousePressEvent(QMouseEvent* event);
@@ -120,13 +124,11 @@ private:
     void PrintTimer();
     void StopAnimation();
     void PrintPause();
-
     void RotationCheck();
-    void DrawZonePos(cv::Mat);
+    void DrawZonePos(Mat);
 
 private slots:
-    void refresh();
-
+    void Refresh();
 
 };
 
