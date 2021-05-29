@@ -101,7 +101,7 @@ private:
     vector<Point> leftPositions;
     vector<Point> rightPositions;
 
-    double error = 30;
+    double error = 20;
 
 public:
     /* Constructor */
@@ -124,6 +124,7 @@ private:
     void PrintTimer();
     void StopAnimation();
     void PrintPause();
+    void Camera();
     void RotationCheck();
     void DrawZonePos(Mat);
 

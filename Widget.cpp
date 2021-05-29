@@ -50,15 +50,15 @@ MKWidget::MKWidget(QOpenGLWidget * parent):QOpenGLWidget(parent)
     cap = VideoCapture(0); // open the default camera
     cap.set(CAP_PROP_FRAME_WIDTH, frameWidth);
     cap.set(CAP_PROP_FRAME_HEIGHT, frameHeight);
-    if(!cap.isOpened())  // check if we succeeded
-    {
+    if(!cap.isOpened()) { // check if we succeeded
         cerr << "Error openning the default camera" << endl;
     }
 
 
-    if( !hand_cascade.load( "../mario-kartse/fist3.xml" ) )
-    {
+    if(!hand_cascade.load( "../mario-kartse/fist3.xml" )) {
         cerr << "Error loading haarcascade" << endl;
+        std::cerr<<"Error openning the default camera"<<std::endl;
+        exit(0);
     }
 
     /* Init output window */
@@ -127,8 +127,8 @@ void MKWidget::resizeGL(int width, int height)
 /**
  * Overriding paintEvent printing method.
  */
-void MKWidget::paintEvent(QPaintEvent *){
-
+void MKWidget::paintEvent(QPaintEvent *)
+{
     Mat frame,frame_gray;
     vector<Rect> hands;
 
@@ -204,6 +204,9 @@ void MKWidget::paintEvent(QPaintEvent *){
 
 
     /* OpenGL part */
+    /*Camera part */
+    Camera();
+
     QPainter painter(this);
     painter.beginNativePainting();
 
@@ -603,6 +606,7 @@ void MKWidget::RotationCheck(){
         rightPositions.pop_back();
     }
 
+
 }
 
 
@@ -611,9 +615,102 @@ void MKWidget::RotationCheck(){
  * @param frame : matrix containning frame infos to draw
  */
 void MKWidget::DrawZonePos(Mat frame){
-    line( frame, Point( frameWidth/3, 0), Point(frameWidth/3, frameHeight), Scalar(0,255,0), 2, LINE_8 );
-    line( frame, Point( 2*frameWidth/3, 0), Point(2*frameWidth/3, frameHeight), Scalar(0,0,255), 2, LINE_8 );
+//    line( frame, Point( frameWidth/3, 0), Point(frameWidth/3, frameHeight), Scalar(0,255,0), 2, LINE_8 );
+//    line( frame, Point( 2*frameWidth/3, 0), Point(2*frameWidth/3, frameHeight), Scalar(0,0,255), 2, LINE_8 );
     rectangle( frame, Point( frameWidth/3, frameHeight/3),Point( 2*frameWidth/3, 2*frameHeight/3),Scalar( 255, 0, 0),2,LINE_8 );
+
+    putText(frame, "Place your left", Point(5,30), FONT_HERSHEY_COMPLEX_SMALL, 0.8, Scalar(0,0,0), 1);
+    putText(frame, "hand on this side", Point(5,50), FONT_HERSHEY_COMPLEX_SMALL, 0.8, Scalar(0,0,0), 1);
+
+    putText(frame, "Place your right", Point(2*frameWidth/3 +5,30), FONT_HERSHEY_COMPLEX_SMALL, 0.8, Scalar(0,0,0), 1);
+    putText(frame, "hand on this side", Point(2*frameWidth/3 +5,50), FONT_HERSHEY_COMPLEX_SMALL, 0.8, Scalar(0,0,0), 1);
+
+    putText(frame, "Place both your hands", Point(frameWidth/3-5,frameHeight/4), FONT_HERSHEY_COMPLEX_SMALL, 0.8, Scalar(0,0,0), 1);
+    putText(frame, "inside the box to brake", Point(frameWidth/3-5,frameHeight/4+20), FONT_HERSHEY_COMPLEX_SMALL, 0.8, Scalar(0,0,0), 1);
+
+}
+
+
+/**
+ * display webcam
+ */
+void MKWidget::Camera(){
+    degree = 0;
+    Mat frame,frame_gray;
+    std::vector<Rect> hands;
+    // Get frame
+    cap >> frame;
+    // Mirror effect
+    flip(frame,frame,1);
+    // Convert to gray
+    cvtColor(frame,frame_gray,COLOR_BGR2GRAY);
+    // Equalize graylevels
+    //        equalizeHist( frame_gray, frame_gray );
+
+
+    //-- Detect hands
+    hand_cascade.detectMultiScale( frame_gray, hands, 1.1, 4, 0, Size(60, 60) );
+
+
+    DrawZonePos(frame);
+
+
+    if (hands.size()>0 && hands.size()<3 ){  // limit to 2 hands
+
+        // Draw green rectangle
+        for (int i=0;i<(int)hands.size();i++){
+
+            // check if hand on the left side of screen
+            if (hands[i].x<= (frameWidth/3 - hands[i].width) ){
+                rectangle(frame,hands[i],Scalar(0,255,0),2);
+               // std::cout <<"x_g:"<< hands[i].x<<" y_g:"<< hands[i].y<<std::endl;
+
+                // Add the left hand coordinants to the list
+                Point p;
+                p.x = hands[i].x;
+                p.y = hands[i].y;
+                leftPositions.push_back(p);
+            }
+
+            // check if hand on the right side of the screen
+            if (hands[i].x>=(2*frameWidth/3)){
+                rectangle(frame,hands[i],Scalar(0,0,255),2);
+               // std::cout <<"x_d:"<< hands[i].x<<" y_d:"<< hands[i].y<<std::endl;
+
+                // Add the Right hand coordinants to the list
+                Point p;
+                p.x = hands[i].x;
+                p.y = hands[i].y;
+                rightPositions.push_back(p);
+            }
+
+
+            // check if the hand is in the center box of the screen
+            if ((hands[i].x>(frameWidth/3 - hands[i].width )) && (hands[i].x < (2*frameWidth/3))
+                  && (hands[i].y>(frameHeight/3))  && (hands[i].y <(2*frameHeight/3))
+                    && (int)hands.size()==2
+                    ){
+                rectangle(frame,hands[i],Scalar(255,0,0),2);
+                std::cout <<(int)hands.size() << "  stop"<<std::endl;
+
+                if(barrel->CarInStopZone(car)){
+                    m_AnimationTimer->stop();
+                    activateMove = false;
+                }
+                stop = true;
+            }else{
+                stop = false;
+            }
+        }
+    }
+
+        if (!(leftPositions.empty()) && !(rightPositions.empty())){
+            RotationCheck();
+        }
+
+
+    // Display frame
+    imshow("WebCam", frame);
 
 }
 
