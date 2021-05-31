@@ -64,10 +64,9 @@ MKWidget::MKWidget(QOpenGLWidget * parent):QOpenGLWidget(parent)
 //    /* Init output window */
 //    namedWindow("WebCam",1);
 
-
     camFrame = new QLabel(this);
     camFrame->resize(2*width()/5,2*height()/5);
-    camFrame->move(width()/3,3*height()/5);
+    camFrame->move(width()/2-camFrame->width()/2,height()-camFrame->height());
 
 }
 
@@ -606,9 +605,10 @@ void MKWidget::PrintGameOver()
     painter.drawRoundedRect(rectangle, 20.0, 15.0);
     painter.setPen(Qt::red);
 
-    QFont font("Monospace", 50);
+    QFont font("Monospace", 30);
     painter.setFont(font);
     painter.drawText(width() / 3, height() / 2, QString("Game over"));
+    painter.drawText(width() / 3, 2*height() / 5, QString("Your score : ") + QString(score));
 
     QFont font2("Monospace", 15);
     painter.setPen(Qt::white);
@@ -653,7 +653,7 @@ void MKWidget::RotationCheck(){
     if ((leftPosition.y - rightPosition.y) > error){
 
         /* Move to the left */
-        left_right = left_right - carWidth / 2 > - roadWidth / 2 && activateMove ? left_right - 2. : gameOver = true;
+        left_right = left_right - carWidth / 2 > - roadWidth / 2 && activateMove ? left_right - 1. : gameOver = true;
         car->setPosition(new float[3] { left_right, 0., 0. });
         degree = activateMove ? 3 : degree;
 
@@ -666,7 +666,7 @@ void MKWidget::RotationCheck(){
     if ((rightPosition.y - leftPosition.y) > error){
 
         /* Move to the right */
-        left_right = left_right + carWidth / 2 < roadWidth / 2 && activateMove ? left_right + 2. : gameOver = true;
+        left_right = left_right + carWidth / 2 < roadWidth / 2 && activateMove ? left_right + 1. : gameOver = true;
         car->setPosition(new float[3] { left_right, 0., 0. });
         degree  = activateMove ? -3 : degree;
 
@@ -687,15 +687,14 @@ void MKWidget::RotationCheck(){
 void MKWidget::DrawZonePos(Mat frame){
     rectangle( frame, Point( frameWidth/3, frameHeight/3),Point( 2*frameWidth/3, 2*frameHeight/3),Scalar( 255, 0, 0),2,LINE_8 );
 
-    putText(frame, "Place your left", Point(5,30), FONT_HERSHEY_COMPLEX_SMALL, 0.8, Scalar(0,0,0), 1);
-    putText(frame, "hand on this side", Point(5,50), FONT_HERSHEY_COMPLEX_SMALL, 0.8, Scalar(0,0,0), 1);
+    putText(frame, "left", Point(5,30), FONT_HERSHEY_SIMPLEX, 0.8, Scalar(200,200,200), 2);
+//    putText(frame, "hand on this side", Point(5,60), FONT_HERSHEY_SIMPLEX, 0.8, Scalar(0,255,255), 2);
 
-    putText(frame, "Place your right", Point(2*frameWidth/3 +5,30), FONT_HERSHEY_COMPLEX_SMALL, 0.8, Scalar(0,0,0), 1);
-    putText(frame, "hand on this side", Point(2*frameWidth/3 +5,50), FONT_HERSHEY_COMPLEX_SMALL, 0.8, Scalar(0,0,0), 1);
+    putText(frame, "right", Point(2*frameWidth/3 +5,30), FONT_HERSHEY_SIMPLEX, 0.8, Scalar(200,200,200), 2);
+//    putText(frame, "hand on this side", Point(2*frameWidth/3 +5,60), FONT_HERSHEY_SIMPLEX, 0.8, Scalar(0,255,255), 2);
 
-    putText(frame, "Place both your hands", cv::Point(frameWidth/3-5,frameHeight/4-20), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cv::Scalar(0,0,0), 1);
-    putText(frame, "inside the box while in", cv::Point(frameWidth/3-5,frameHeight/4), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cv::Scalar(0,0,0), 1);
-    putText(frame, "a stop zone to brake", cv::Point(frameWidth/3-5,frameHeight/4+20), FONT_HERSHEY_COMPLEX_SMALL, 0.8, cv::Scalar(0,0,0), 1);
+    putText(frame, "Place both your hands inside the box while in", cv::Point(40,frameHeight/4-40), FONT_HERSHEY_SIMPLEX, 0.8, cv::Scalar(200,200,200), 2);
+    putText(frame, "a stop zone to brake", cv::Point(frameWidth/3-5,frameHeight/4+20), FONT_HERSHEY_SIMPLEX, 0.8, cv::Scalar(200,200,200), 2);
 }
 
 
