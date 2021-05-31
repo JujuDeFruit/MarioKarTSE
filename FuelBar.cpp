@@ -12,7 +12,8 @@ void FuelBar::Decrease(float decrement) {
     value = value - decrement <= 0. ? 0. : value; // Limitate min value to 0.
 
     /* Exit if fuel bar is empty */
-    if (value == 0.0) exit(0);
+    if (value == 0.0){ gameOverFuel = true;
+    }else{ gameOverFuel = false;}
 
     /* Decrease fuael bar value. */
     value -= decrement;

@@ -208,6 +208,10 @@ void MKWidget::paintEvent(QPaintEvent *)
         PrintGameOver();
         car->setPosition(new float[3] { 0, 0., 0. });
     }
+    else if (fuelBar->getGameOver()){
+        PrintGameOver();
+        car->setPosition(new float[3] { 0, 0., 0. });
+    }
 
 
 }
