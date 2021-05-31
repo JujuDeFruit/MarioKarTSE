@@ -28,8 +28,8 @@ public:
     void Fill(bool pause) { value = pause ? MAX : value; };
     void Display();
 
-    /* getters */
-    bool getGameOver(){return gameOverFuel; };
+    /* Getters */
+    bool GetGameOver(){return gameOverFuel; };
 };
 
 #endif // FUELBAR_H
