@@ -1,6 +1,6 @@
 #include "Widget.h"
 #include <QtMath>
-
+#include <QScreen>
 
 /**
  * Constructor of main openGL Widget
@@ -11,7 +11,7 @@ MKWidget::MKWidget(QOpenGLWidget * parent):QOpenGLWidget(parent)
 {
     /* Window settings */
     setFixedSize(WIN, WIN);
-    move(QApplication::desktop()->screen()->rect().center() - rect().center());
+    move(QGuiApplication::primaryScreen()->geometry().center() - rect().center());
 
     m_AnimationTimer = new QTimer(this);
     /* Create and set timer */
