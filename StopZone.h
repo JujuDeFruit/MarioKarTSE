@@ -13,8 +13,8 @@ class StopZone
 {
 private:
     /* Dimensions of area. */
-    const float width = 25.;
-    const float height = 15.;
+    const float WIDTH = 25.;
+    const float HEIGHT = 15.;
 
     /* Current position of the barrel. */
     float * position;
@@ -27,13 +27,13 @@ public:
     void Display();
 
     /* Setter. */
-    void setPosition(float * newPosition) { position = newPosition; }
+    void SetPosition(float * newPosition) { position = newPosition; }
 
     /* Getters. */
     float * GetPosition() const { return position; }
     float * GetXRange() const;
-    float * GetZRange() const { return new float[2] {position[2] - 2 * height / 3, position[2] + 2 * height / 3 }; }
-    float * GetAreaDimensions() const { return new float[2] { width, height }; }
+    float * GetZRange() const { return new float[2] {position[2] - 2 * HEIGHT / 3, position[2] + 2 * HEIGHT / 3 }; }
+    float * GetAreaDimensions() const { return new float[2] { WIDTH, HEIGHT }; }
 
 };
 

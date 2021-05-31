@@ -9,6 +9,7 @@ win32 {
         LIBS     += opengl32.lib glu32.lib
     } else {
         LIBS     += -lopengl32 -lglu32
+
     }
 }
 else {
@@ -16,8 +17,9 @@ else {
 }
 
 
+
 # nom de l'exe genere
-TARGET 	  = StarterTD2
+TARGET 	  = MarioKarTSE
 
 # fichiers sources/headers/ressources
 SOURCES += Main.cpp Widget.cpp \
@@ -35,3 +37,18 @@ HEADERS += Widget.h \
 
 RESOURCES += \
     res/textures.qrc
+
+    # ajout des libs au linker
+INCLUDEPATH +=$$(OPENCV_DIR)\..\..\include
+
+
+LIBS     += -lopengl32 -lglu32 \
+        -L$$(OPENCV_DIR)\lib \
+        -lopencv_core451 \
+        -lopencv_highgui451 \
+        -lopencv_imgproc451 \
+        -lopencv_imgcodecs451 \
+        -lopencv_videoio451 \
+        -lopencv_features2d451 \
+        -lopencv_calib3d451 \
+        -lopencv_objdetect451

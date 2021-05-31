@@ -17,6 +17,18 @@
 #include "FuelBar.h"
 #include "StopZone.h"
 
+
+#include "opencv2/imgproc.hpp"
+#include "opencv2/highgui.hpp"
+#include <opencv2/objdetect.hpp>
+
+#include <cstdio>
+#include <iostream>
+#include <vector>
+
+using namespace cv;
+using namespace std;
+
 /**
  * @brief The MyGLWidget class
  * Generate and manage OpenGL scene.
@@ -36,6 +48,14 @@
  * @param distBetOppCars : distance between 2 opposite cars.
  * @param m_barrelPressed : check if barrel is clicked or not.
  * @param score : score of the player. Score is increased by 1 for each exceeded opposite car.
+ * @param cap : Default video capture.
+ * @param hand_cascade : Cascade containning values trained to detect hands.
+ * @param frameWidth : Frame width.
+ * @param frameHeight : Frame height.
+ * @param stop : stop animation bool.
+ * @param rightPositions : current right hand positions (vector of points).
+ * @param leftPositions : current left hand positions (vector of points).
+ * @param error : detection sensibility
  */
 class MKWidget : public QOpenGLWidget
 {
@@ -67,18 +87,34 @@ private:
     bool activateMove = true;
     bool pause = false;
 
+    bool gameOver = false;
+
     int score = 0;
     QElapsedTimer * timer;
 
+
+    VideoCapture cap;
+    CascadeClassifier hand_cascade;
+    int frameWidth=640;
+    int frameHeight=480;
+    bool stop = false;
+
+
+    vector<Point> leftPositions;
+    vector<Point> rightPositions;
+
+    double error = 20;
+
 public:
     /* Constructor */
-    MKWidget(QOpenGLWidget * parent = nullptr);
+    MKWidget(QOpenGLWidget * = nullptr);
+    /* Destructor */
+    ~MKWidget();
 
 private:
     /* Herited methods from QOpenGLWidget. Overrided methods */
     virtual void initializeGL();
     virtual void resizeGL(int, int);
-  //  virtual void paintGL();
     virtual void keyPressEvent(QKeyEvent* event);
     virtual void keyReleaseEvent(QKeyEvent* event);
     virtual void mousePressEvent(QMouseEvent* event);
@@ -92,10 +128,13 @@ private:
     void PrintTimer();
     void StopAnimation();
     void PrintPause();
+    void PrintGameOver();
+    void Camera();
+    void RotationCheck();
+    void DrawZonePos(Mat);
 
 private slots:
-    void refresh();
-
+    void Refresh();
 
 };
 
