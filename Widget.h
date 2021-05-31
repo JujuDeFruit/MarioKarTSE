@@ -54,6 +54,7 @@ using namespace std;
  * @param frameWidth : Frame width.
  * @param frameHeight : Frame height.
  * @param stop : stop animation bool.
+ * @param camFrame : camera pointer.
  * @param rightPositions : current right hand positions (vector of points).
  * @param leftPositions : current left hand positions (vector of points).
  * @param error : detection sensibility
@@ -101,13 +102,12 @@ private:
     int frameHeight=480;
     bool stop = false;
 
-    QLabel *camFrame = nullptr;
-
+    QLabel * camFrame = nullptr;
 
     vector<Point> leftPositions;
     vector<Point> rightPositions;
 
-    double error = 20;
+    double error = 30;
 
 public:
     /* Constructor */

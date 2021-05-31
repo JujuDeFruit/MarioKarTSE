@@ -288,13 +288,13 @@ void MKWidget::paintEvent(QPaintEvent *)
     if (pause){
         PrintPause();
     }
-    if (gameOver){
+    else if (gameOver){
         PrintGameOver();
         car->setPosition(new float[3] { 0, 0., 0. });
     }
-    if (colision){
-        car->setPosition(new float[3] { 0, 0., 0. });
+    else if (colision){
         PrintGameOver();
+        car->setPosition(new float[3] { 0, 0., 0. });
     }
 
 
@@ -338,6 +338,7 @@ void MKWidget::keyPressEvent(QKeyEvent * event)
         score = 0;
         timer->restart();
         fuelBar->Fill(!(pause));
+        for (int i = 0; i < NB_OPPOSITE_CARS; i++) GenerateCar(i, true);
         gameOver = false;
         colision = false;
         break;
@@ -474,7 +475,7 @@ void MKWidget::GenerateCar(unsigned int i, bool init) {
     *(oppositeCars + i) = oppositeCar;
 
     /* If a new car was generated and it was not an initialization of the scene, then increase score. */
-    score = init ? score : score + 1;
+    score = init || gameOver ? score : score + 1;
 }
 
 
@@ -608,7 +609,10 @@ void MKWidget::PrintGameOver()
     QFont font("Monospace", 30);
     painter.setFont(font);
     painter.drawText(width() / 3, height() / 2, QString("Game over"));
-    painter.drawText(width() / 3, 2*height() / 5, QString("Your score : ") + QString(score));
+
+    QFont font3("Monospace", 10);
+    painter.setFont(font3);
+    painter.drawText(width() / 3, 2*height() / 5, QString("Your score : ") + QString::number(score));
 
     QFont font2("Monospace", 15);
     painter.setPen(Qt::white);
@@ -675,8 +679,6 @@ void MKWidget::RotationCheck(){
         rightPositions.pop_back();
 
     }
-
-
 }
 
 
@@ -685,16 +687,14 @@ void MKWidget::RotationCheck(){
  * @param frame : matrix containning frame infos to draw
  */
 void MKWidget::DrawZonePos(Mat frame){
-    rectangle( frame, Point( frameWidth/3, frameHeight/3),Point( 2*frameWidth/3, 2*frameHeight/3),Scalar( 255, 0, 0),2,LINE_8 );
+    rectangle(frame, Point(frameWidth / 3, frameHeight / 3), Point(2 * frameWidth / 3, 2 * frameHeight / 3), Scalar(255, 0, 0), 2, LINE_8);
 
-    putText(frame, "left", Point(5,30), FONT_HERSHEY_SIMPLEX, 0.8, Scalar(200,200,200), 2);
-//    putText(frame, "hand on this side", Point(5,60), FONT_HERSHEY_SIMPLEX, 0.8, Scalar(0,255,255), 2);
+    putText(frame, "left", Point(5, 30), FONT_HERSHEY_SIMPLEX, 0.8, Scalar(200, 200, 200), 2);
 
-    putText(frame, "right", Point(2*frameWidth/3 +5,30), FONT_HERSHEY_SIMPLEX, 0.8, Scalar(200,200,200), 2);
-//    putText(frame, "hand on this side", Point(2*frameWidth/3 +5,60), FONT_HERSHEY_SIMPLEX, 0.8, Scalar(0,255,255), 2);
+    putText(frame, "right", Point(2 * frameWidth / 3 + 5, 30), FONT_HERSHEY_SIMPLEX, 0.8, Scalar(200, 200, 200), 2);
 
-    putText(frame, "Place both your hands inside the box while in", cv::Point(40,frameHeight/4-40), FONT_HERSHEY_SIMPLEX, 0.8, cv::Scalar(200,200,200), 2);
-    putText(frame, "a stop zone to brake", cv::Point(frameWidth/3-5,frameHeight/4+20), FONT_HERSHEY_SIMPLEX, 0.8, cv::Scalar(200,200,200), 2);
+    putText(frame, "Place both your hands inside the box while in", Point(20, frameHeight / 4 - 40), FONT_HERSHEY_SIMPLEX, 0.8, Scalar(200, 200, 200), 2);
+    putText(frame, "a stop zone to brake", Point(frameWidth / 3 - 5, frameHeight / 4 + 20), FONT_HERSHEY_SIMPLEX, 0.8, Scalar(200, 200, 200), 2);
 }
 
 
@@ -704,23 +704,18 @@ void MKWidget::DrawZonePos(Mat frame){
 void MKWidget::Camera(){
 
     Mat frame,frame_gray;
-    std::vector<Rect> hands;
-    // Get frame
+    vector<Rect> hands;
+    /* Get frame */
     cap >> frame;
-    // Mirror effect
+    /* Mirror effect */
     flip(frame,frame,1);
-    // Convert to gray
-    cvtColor(frame,frame_gray,COLOR_BGR2GRAY);
-    // Equalize graylevels
-    //        equalizeHist( frame_gray, frame_gray );
+    /* Convert to gray */
+    cvtColor(frame, frame_gray, COLOR_BGR2GRAY);
 
-
-    //-- Detect hands
-    hand_cascade.detectMultiScale( frame_gray, hands, 1.1, 4, 0, Size(60, 60) );
-
+    /* Detect hands */
+    hand_cascade.detectMultiScale(frame_gray, hands, 1.1, 4, 0, Size(60, 60));
 
     DrawZonePos(frame);
-
 
     if (hands.size()>0 && hands.size()<3 ){  // limit to 2 hands
 
@@ -730,7 +725,6 @@ void MKWidget::Camera(){
             // check if hand on the left side of screen
             if (hands[i].x<= (frameWidth/3 - hands[i].width) ){
                 rectangle(frame,hands[i],Scalar(0,255,0),2);
-               // std::cout <<"x_g:"<< hands[i].x<<" y_g:"<< hands[i].y<<std::endl;
 
                 // Add the left hand coordinants to the list
                 Point p;
@@ -742,7 +736,6 @@ void MKWidget::Camera(){
             // check if hand on the right side of the screen
             if (hands[i].x>=(2*frameWidth/3)){
                 rectangle(frame,hands[i],Scalar(0,0,255),2);
-               // std::cout <<"x_d:"<< hands[i].x<<" y_d:"<< hands[i].y<<std::endl;
 
                 // Add the Right hand coordinants to the list
                 Point p;
@@ -758,22 +751,21 @@ void MKWidget::Camera(){
                     && (int)hands.size()==2
                     ){
                 rectangle(frame,hands[i],cv::Scalar(255,0,0),2);
-//                std::cout <<(int)hands.size() << "  stop"<<std::endl;
 
                 if(barrel->CarInStopZone(car)){
                     degree = 0;
                     m_AnimationTimer->stop();
                     activateMove = false;            
                 }
-
+            }
         }
-    }
 
         if (!(leftPositions.empty()) && !(rightPositions.empty())){
             RotationCheck();
         }
-//    // Display frame
-//    imshow("WebCam", frame);
-}else{degree = 0;}
 
+    }
+    else {
+        degree = 0;
+    }
 }
