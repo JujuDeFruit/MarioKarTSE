@@ -25,6 +25,7 @@
 #include <cstdio>
 #include <iostream>
 #include <vector>
+#include <QLabel>
 
 using namespace cv;
 using namespace std;
@@ -88,6 +89,7 @@ private:
     bool pause = false;
 
     bool gameOver = false;
+    bool colision = false;
 
     int score = 0;
     QElapsedTimer * timer;
@@ -98,6 +100,8 @@ private:
     int frameWidth=640;
     int frameHeight=480;
     bool stop = false;
+
+    QLabel *camFrame = nullptr;
 
 
     vector<Point> leftPositions;

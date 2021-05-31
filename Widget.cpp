@@ -48,8 +48,8 @@ MKWidget::MKWidget(QOpenGLWidget * parent):QOpenGLWidget(parent)
     /* Camera */
 
     cap = VideoCapture(0); // open the default camera
-    cap.set(CAP_PROP_FRAME_WIDTH, frameWidth);
-    cap.set(CAP_PROP_FRAME_HEIGHT, frameHeight);
+//    cap.set(CAP_PROP_FRAME_WIDTH, frameWidth);
+//    cap.set(CAP_PROP_FRAME_HEIGHT, frameHeight);
     if(!cap.isOpened()) { // check if we succeeded
         cerr << "Error openning the default camera" << endl;
     }
@@ -61,8 +61,13 @@ MKWidget::MKWidget(QOpenGLWidget * parent):QOpenGLWidget(parent)
         exit(0);
     }
 
-    /* Init output window */
-    namedWindow("WebCam",1);
+//    /* Init output window */
+//    namedWindow("WebCam",1);
+
+
+    camFrame = new QLabel(this);
+    camFrame->resize(2*width()/5,2*height()/5);
+    camFrame->move(width()/3,3*height()/5);
 
 }
 
@@ -146,7 +151,7 @@ void MKWidget::resizeGL(int width, int height)
  * @param QPaintEvent : paint event
  */
 void MKWidget::paintEvent(QPaintEvent *)
-{
+{   
     Mat frame,frame_gray;
     vector<Rect> hands;
 
@@ -216,14 +221,23 @@ void MKWidget::paintEvent(QPaintEvent *)
             RotationCheck();
         }
 
-    /* Displays frame */
-    imshow("WebCam", frame);
 
+        /* Displays frame */
+        Mat displayFrame;
+            frame.copyTo(displayFrame);
 
+            QImage qImage(displayFrame.data, displayFrame.cols, displayFrame.rows, displayFrame.step, QImage::Format_BGR888);
+            QPixmap qPix = QPixmap::fromImage(qImage);
 
-    /* OpenGL part */
+            camFrame->setPixmap(qPix.scaled(camFrame->width(),camFrame->height(),Qt::KeepAspectRatio));
+
+//
+//    imshow("WebCam", frame);
+
     /*Camera part */
     Camera();
+
+    /* OpenGL part */
 
     QPainter painter(this);
     painter.beginNativePainting();
@@ -277,8 +291,11 @@ void MKWidget::paintEvent(QPaintEvent *)
     }
     if (gameOver){
         PrintGameOver();
-        StopAnimation();
         car->setPosition(new float[3] { 0, 0., 0. });
+    }
+    if (colision){
+        car->setPosition(new float[3] { 0, 0., 0. });
+        PrintGameOver();
     }
 
 
@@ -319,9 +336,11 @@ void MKWidget::keyPressEvent(QKeyEvent * event)
         exit(0);
 
     case Qt::Key_R:
+        score = 0;
+        timer->restart();
+        fuelBar->Fill(!(pause));
         gameOver = false;
-        car->setPosition(new float[3] { 0, 0., 0. });
-        StopAnimation();
+        colision = false;
         break;
 
         /* Default case. */
@@ -519,12 +538,7 @@ void MKWidget::CheckCollison() {
                 ||( oppPos[0] < xCarPos + car->GetWidth()
                     && oppPos[0] + oppositeCars[i]->GetWidth() >= xCarPos + car->GetWidth()))
             ) {
-//          exit(0);
-//            float * resetPos = new float[3]{0.f,0.f,0.f};
-//            car->setPosition(resetPos);
-            gameOver = true;
-            float * resetPos = new float[3]{0.f,0.f,0.f};
-            car->setPosition(resetPos);
+            colision = true;
         }
     }
 }
@@ -541,9 +555,9 @@ void MKWidget::PrintTimer()
     painter.setRenderHint(QPainter::Antialiasing);
 
     /* New painter to print text on screen. */
-    painter.setPen(Qt::black);
+    painter.setPen(Qt::red);
 
-    QFont font("Monospace", 30);
+    QFont font("Arial", 30);
     painter.setFont(font);
 
     painter.drawText(width() / 10, height() / 20, QString("Score : ") + QString::number(score) + QString(" pts"));
@@ -567,11 +581,11 @@ void MKWidget::PrintPause()
     painter.drawRoundedRect(rectangle, 20.0, 15.0);
     painter.setPen(Qt::white);
 
-    QFont font("Monospace", 70);
+    QFont font("Arial", 70);
     painter.setFont(font);
     painter.drawText(width() / 3, height() / 2, QString("Pause"));
 
-    QFont font2("Monospace", 15);
+    QFont font2("Arial", 15);
     painter.setFont(font2);
     painter.drawText(width() / 3, 3*height() /5, QString("Press P to resume"));
     painter.end();
@@ -759,12 +773,8 @@ void MKWidget::Camera(){
         if (!(leftPositions.empty()) && !(rightPositions.empty())){
             RotationCheck();
         }
-
-
-
-    // Display frame
-    imshow("WebCam", frame);
-
+//    // Display frame
+//    imshow("WebCam", frame);
 }else{degree = 0;}
 
 }
