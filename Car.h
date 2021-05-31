@@ -35,7 +35,7 @@ public:
     float * GetPosition() { return position; }
 
     /* Setters */
-    void setPosition(float * pos) { position = pos; }
+    void SetPosition(float * pos) { position = pos; }
 
 };
 
