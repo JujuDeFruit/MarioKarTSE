@@ -278,6 +278,7 @@ void MKWidget::paintEvent(QPaintEvent *)
     if (gameOver){
         PrintGameOver();
         StopAnimation();
+        car->setPosition(new float[3] { 0, 0., 0. });
     }
 
 
@@ -297,14 +298,14 @@ void MKWidget::keyPressEvent(QKeyEvent * event)
     {
     /* Move car to left side, and make sure car does not get out of the road. */
     case Qt::Key_Left:
-        left_right = left_right - carWidth / 2 > - roadWidth / 2 && activateMove ? left_right - 2. : left_right;
+        left_right = left_right - carWidth / 2 > - roadWidth / 2 && activateMove ? left_right - 2. : gameOver = true;
         car->setPosition(new float[3] { left_right, 0., 0. });
         degree = activateMove ? 3 : degree;
         break;
 
         /* Move car to right side, and make sure car does not get out of the road. */
     case Qt::Key_Right:
-        left_right = left_right + carWidth / 2 < roadWidth / 2 && activateMove ? left_right + 2. : left_right;
+        left_right = left_right + carWidth / 2 < roadWidth / 2 && activateMove ? left_right + 2. : gameOver = true;
         car->setPosition(new float[3] { left_right, 0., 0. });
         degree  = activateMove ? -3 : degree;
         break;
@@ -319,6 +320,7 @@ void MKWidget::keyPressEvent(QKeyEvent * event)
 
     case Qt::Key_R:
         gameOver = false;
+        car->setPosition(new float[3] { 0, 0., 0. });
         StopAnimation();
         break;
 
@@ -518,7 +520,11 @@ void MKWidget::CheckCollison() {
                     && oppPos[0] + oppositeCars[i]->GetWidth() >= xCarPos + car->GetWidth()))
             ) {
 //          exit(0);
+//            float * resetPos = new float[3]{0.f,0.f,0.f};
+//            car->setPosition(resetPos);
             gameOver = true;
+            float * resetPos = new float[3]{0.f,0.f,0.f};
+            car->setPosition(resetPos);
         }
     }
 }
@@ -633,7 +639,7 @@ void MKWidget::RotationCheck(){
     if ((leftPosition.y - rightPosition.y) > error){
 
         /* Move to the left */
-        left_right = left_right - carWidth / 2 > - roadWidth / 2 && activateMove ? left_right - 2. : left_right;
+        left_right = left_right - carWidth / 2 > - roadWidth / 2 && activateMove ? left_right - 2. : gameOver = true;
         car->setPosition(new float[3] { left_right, 0., 0. });
         degree = activateMove ? 3 : degree;
 
@@ -646,7 +652,7 @@ void MKWidget::RotationCheck(){
     if ((rightPosition.y - leftPosition.y) > error){
 
         /* Move to the right */
-        left_right = left_right + carWidth / 2 < roadWidth / 2 && activateMove ? left_right + 2. : left_right;
+        left_right = left_right + carWidth / 2 < roadWidth / 2 && activateMove ? left_right + 2. : gameOver = true;
         car->setPosition(new float[3] { left_right, 0., 0. });
         degree  = activateMove ? -3 : degree;
 
